@@ -124,15 +124,15 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
   
   if(!is.null(depth) | add_depth_to_output){
     # Find the zct values for the grids in df_var
-    zct_vals = m_zct[as.matrix(df_var[, .(x_ind, y_ind, z, time_ind)])]
+    zct_vals = mtrx_zct[as.matrix(df_var[, .(x_ind, y_ind, z, time_ind)])]
     df_var[, zct := zct_vals]
     rm(zct_vals)
   }
   
   if(!is.null(depth)){
     # Add surface and bottom levels
-    z_surf_vals = m_lvl_surf[as.matrix(df_var[, .(x_ind, y_ind, time_ind)])]
-    z_bott_vals = m_lvl_bott[as.matrix(df_var[, .(x_ind, y_ind, time_ind)])]
+    z_surf_vals = mtrx_surf[as.matrix(df_var[, .(x_ind, y_ind, time_ind)])]
+    z_bott_vals = mtrx_bott[as.matrix(df_var[, .(x_ind, y_ind, time_ind)])]
     df_var[, `:=`(z_surf = z_surf_vals,
                   z_bott = z_bott_vals)]
     rm(z_surf_vals, z_bott_vals)
