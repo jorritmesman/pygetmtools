@@ -10,8 +10,7 @@ Maintainer: Jorrit Mesman <jorrit.mesman@ebc.uu.se>
 Description: Tools for pre- and post-processing of PyGETM simulations.
 License: GPL-2.0
 Depends:
-    R (>= 4.0)
-	data.table
+    R (>= 4.0),data.table
 Imports:
     ncdf4
 Encoding: UTF-8
