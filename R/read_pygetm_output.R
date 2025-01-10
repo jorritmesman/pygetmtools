@@ -35,6 +35,7 @@
 #'                     round_depth = 2L,
 #'                     round_val = 3L)
 #'  }
+#' @import ncdf4
 #' @export
 
 read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = NULL, transect = NULL, save_everything = F,
