@@ -153,6 +153,9 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
                     by = .(time_ind, x, y)]
   }
   
+  df_var[, `:=`(x = as.numeric(x),
+                y = as.numeric(y))]
+  
   # Fix headers
   if("zct" %in% names(df_var) & !("depth" %in% names(df_var))){
     setnames(df_var, old = "zct", new = "depth")
