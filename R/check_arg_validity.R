@@ -37,8 +37,8 @@ check_arg_validity = function(ncdf, x, y, depth, z, transect, save_everything){
     return()
   }
   
-  if(is.null(x) & is.null(y) & is.null(z) & is.null(depth)){
-    stop("At least one of 'x', 'y', or 'z'/'depth' should be NULL, or use 'save_everything'!")
+  if(is.null(x) & is.null(y) & is.null(z) & is.null(depth) & is.null(transect)){
+    stop("At least one of 'x', 'y', 'z', 'depth', or 'transect' should be specified, or use 'save_everything'!")
   }
   
   if(sum(!is.null(x), !is.null(y)) == 1L){
@@ -48,10 +48,6 @@ check_arg_validity = function(ncdf, x, y, depth, z, transect, save_everything){
   
   if(!is.null(z) & !is.null(depth)){
     stop("'z' and 'depth' express the same dimension and cannot be used together!")
-  }
-  
-  if(is.null(x) & is.null(y) & is.null(z) & is.null(depth) & is.null(transect)){
-    stop("At least one of 'x', 'y', 'z', 'depth', or 'transect' should be specified!")
   }
   
   if(!is.null(depth)){
