@@ -83,7 +83,7 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
                         time_ind = t)]
           tmp_df
         })
-        tmp_df_z = rbindlist(lst_mtrx_z)
+        rbindlist(lst_mtrx_z)
       })
     }
     
@@ -103,16 +103,25 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
     }else{
       z_extent = z
     }
-    lst_mtrx = lapply(seq_len(nrow(transect)), function(id) data.table(transect_id = id,
-                                                                       x = transect[id, x],
-                                                                       y = transect[id, y],
-                                                                       z = z_extent,
-                                                                       time_ind = seq_len(m_dims[4]),
-                                                                       val = mtrx[get_ind(transect[id, x], x_dim),
-                                                                                  get_ind(transect[id, y], y_dim),
-                                                                                  z_extent,]))
+    lst_mtrx = lapply(seq_len(nrow(transect)), function(id){
+      lst_mtrx_t = lapply(seq_len(m_dims[4]), function(t){
+        data.table(transect_id = id,
+                   x = transect[id, x],
+                   y = transect[id, y],
+                   z = z_extent,
+                   time_ind = t,
+                   val = mtrx[get_ind(transect[id, x], x_dim),
+                              get_ind(transect[id, y], y_dim),
+                              z_extent, t])
+      })
+      rbindlist(lst_mtrx_t)
+    })
     df_var = rbindlist(lst_mtrx)
     setorder(df_var, time_ind, x, y, z)
+    
+    # Need to add x_ind and y_ind
+    df_var[, `:=`(x_ind = sapply(df_var$x, function(ind) get_ind(ind, x_dim)),
+                  y_ind = sapply(df_var$y, function(ind) get_ind(ind, y_dim)))]
   }
   
   # Any missing grid cell can be assumed to be NA in further analyses
