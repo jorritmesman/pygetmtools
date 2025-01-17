@@ -2,7 +2,6 @@
 
 export(dict_convert)
 export(extract_from_profile)
-export(plot_sideview)
 export(plot_topview)
 export(read_multiple)
 export(read_pygetm_output)
