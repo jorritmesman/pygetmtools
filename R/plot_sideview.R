@@ -51,7 +51,7 @@ plot_sideview = function(df, var, col_id = "transect_id", col_depth = "depth", s
   
   ggplot(df) +
     geom_tile(aes(.data[[col_id]], .data[[col_depth]], fill = .data[[var]])) +
-    scale_fill_distiller(palette = the_palette, na.value = na_colour) +
+    scale_fill_distiller(palette = the_palette, direction = 1, na.value = na_colour) +
     labs(...) +
     theme_light() +
     theme(panel.grid = element_blank())
