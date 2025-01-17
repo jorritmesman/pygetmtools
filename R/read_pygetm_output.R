@@ -20,6 +20,8 @@
 #'   ignored of 'transect' is provided. If NULL, will not extract transect.
 #' @param save_everything logical; if TRUE, exports entire output, without formatting. Defaults to FALSE
 #' @param round_depth,round_val integer; Round depth and variable value to this many digits. No rounding if NULL.
+#' @param profile_interval numeric; single value, calculates output depths for a profile with
+#'   this depth interval
 #' @author
 #'   Jorrit Mesman
 #' @examples
@@ -39,7 +41,7 @@
 #' @export
 
 read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = NULL, transect = NULL, save_everything = F,
-                              round_depth = NULL, round_val = NULL){
+                              round_depth = NULL, round_val = NULL, profile_interval = NULL){
   ### Check validity of input arguments
   check_arg_validity(ncdf = ncdf, x = x, y = y, depth = depth, z = z, transect = transect, save_everything = save_everything)
   
@@ -89,7 +91,8 @@ read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = N
   df_var = slice_matrix(m_all, x_dim = x_dim, y_dim = y_dim,
                         x = x, y = y, depth = depth, z = z,
                         transect = transect, mtrx_zct = m_zct,
-                        mtrx_surf = m_lvl_surf, mtrx_bott = m_lvl_bott)
+                        mtrx_surf = m_lvl_surf, mtrx_bott = m_lvl_bott,
+                        profile_interval = profile_interval)
   
   if(!is.null(round_depth) & "depth" %in% names(df_var)){
     df_var[, depth := round(depth, digits = round_depth)]

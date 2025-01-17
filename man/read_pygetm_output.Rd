@@ -14,7 +14,8 @@ read_pygetm_output(
   transect = NULL,
   save_everything = F,
   round_depth = NULL,
-  round_val = NULL
+  round_val = NULL,
+  profile_interval = NULL
 )
 }
 \arguments{
@@ -38,6 +39,9 @@ ignored of 'transect' is provided. If NULL, will not extract transect.}
 \item{save_everything}{logical; if TRUE, exports entire output, without formatting. Defaults to FALSE}
 
 \item{round_depth, round_val}{integer; Round depth and variable value to this many digits. No rounding if NULL.}
+
+\item{profile_interval}{numeric; single value, calculates output depths for a profile with
+this depth interval}
 }
 \description{
 Read a PyGETM output file (3D)

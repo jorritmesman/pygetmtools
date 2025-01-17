@@ -2,30 +2,36 @@
 % Please edit documentation in R/extract_from_profile.R
 \name{extract_from_profile}
 \alias{extract_from_profile}
-\title{Extract a value for specific depths from a profile}
+\title{Extract values for specific depths from a profile}
 \usage{
-extract_from_profile(vals, depths, the_depth, depth_bott)
+extract_from_profile(vals, depths, depths_out, depth_bott)
 }
 \arguments{
 \item{vals}{numeric; vector of values, same length as depths}
 
 \item{depths}{numeric; ordered vector of values, same length as depths}
 
-\item{the_depth}{numeric; depth for which to extract the value.}
+\item{depths_out}{numeric; vector of depths for which to extract the value.}
 
 \item{depth_bott}{numeric; depth below surface of the bottom (negative).}
 }
 \description{
-Extract a value for specific depths from a profile
+Extract values for specific depths from a profile
 }
 \details{
-A function to extract a value from a certain depth ("the_depth")
+A function to extract (a) value(s) from specific depths ("depths_out")
+ Depths are assumed to be negative, relative to the water surface
+ 'depths' refers to the centre of the pygetm cells ('zct')
+ Values between depths are calculated from linear interpolation, and
+ depths above or below the upper and lower cell, respectively, are set
+ to that cell's value. Positive 'the_depth' generates an error and 
+ 'depths_out' lower than the bottom return NA.
 }
 \examples{
- calc_depth_from_z(vals = c(3.5, 4, 6.8, 7.1, 8.9),
-                   depths = c(-4.6, -3.9, -2.8, -1.9, -0.7),
-                   the_depth = -3,
-                   depth_bott = -5.2)
+ extract_from_profile(vals = c(3.5, 4, 6.8, 7.1, 8.9),
+                      depths = c(-4.6, -3.9, -2.8, -1.9, -0.7),
+                      depths_out = seq(-6, -0.5, by = 0.5),
+                      depth_bott = -5.2)
 }
 \author{
 Jorrit Mesman

@@ -16,7 +16,8 @@ slice_matrix(
   mtrx_zct = NULL,
   mtrx_surf = NULL,
   mtrx_bott = NULL,
-  add_depth_to_output = T
+  add_depth_to_output = T,
+  profile_interval = NULL
 )
 }
 \arguments{
@@ -44,6 +45,9 @@ of the interfaces ('zft') and given for the uppermost and lowermost layer, respe
 
 \item{add_depth_to_output}{logical; if true and 'depth' is not provided, then
 still 'depth' is calculated for each value of 'z'}
+
+\item{profile_interval}{numeric; single value, calculates output depths for a profile with
+this depth interval}
 }
 \description{
 Extract part of a matrix

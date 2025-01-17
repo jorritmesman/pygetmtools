@@ -25,6 +25,8 @@
 #'   ignored of 'transect' is provided. If NULL, will not extract transect.
 #' @param save_everything logical; if TRUE, exports entire output, without formatting. Defaults to FALSE
 #' @param round_depth,round_val integer; Round depth and variable value to this many digits. No rounding if NULL.
+#' @param profile_interval numeric; single value, calculates output depths for a profile with
+#'   this depth interval
 #' @author
 #'   Jorrit Mesman
 #' @examples
@@ -43,14 +45,14 @@
 #' @export
 
 read_multiple = function(ncdfs, var, x = NULL, y = NULL, depth = NULL, z = NULL, transect = NULL, save_everything = F,
-                         round_depth = NULL, round_val = NULL){
+                         round_depth = NULL, round_val = NULL, profile_interval = NULL){
   pb = txtProgressBar(min = 0, max = length(ncdfs), style = 3)
   
   lst_files = lapply(seq_along(ncdfs), function(ind){
     setTxtProgressBar(pb, ind)
     read_pygetm_output(ncdf = ncdfs[ind], var = var, x = x, y = y, depth = depth,
                        z = z, transect = transect, save_everything = save_everything,
-                       round_depth = round_depth, round_val = round_val)
+                       round_depth = round_depth, round_val = round_val, profile_interval = profile_interval)
   })
   
   df_all = rbindlist(lst_files)

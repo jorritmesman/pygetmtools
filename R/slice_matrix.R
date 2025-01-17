@@ -24,12 +24,14 @@
 #'   of the interfaces ('zft') and given for the uppermost and lowermost layer, respectively
 #' @param add_depth_to_output logical; if true and 'depth' is not provided, then
 #'   still 'depth' is calculated for each value of 'z'
+#' @param profile_interval numeric; single value, calculates output depths for a profile with
+#'   this depth interval
 #' @author
 #'   Jorrit Mesman
 
 slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct = NULL,
                         mtrx_surf = NULL, mtrx_bott = NULL,
-                        add_depth_to_output = T){
+                        add_depth_to_output = T, profile_interval = NULL){
   m_dims = dim(mtrx)
   
   # Separate approaches transects and others
@@ -131,14 +133,14 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
     return(df_var)
   }
   
-  if(!is.null(depth) | add_depth_to_output){
+  if(!is.null(depth) | !is.null(profile_interval) | add_depth_to_output){
     # Find the zct values for the grids in df_var
     zct_vals = mtrx_zct[as.matrix(df_var[, .(x_ind, y_ind, z, time_ind)])]
     df_var[, zct := zct_vals]
     rm(zct_vals)
   }
   
-  if(!is.null(depth)){
+  if(!is.null(depth) | !is.null(profile_interval)){
     # Add surface and bottom levels
     z_surf_vals = mtrx_surf[as.matrix(df_var[, .(x_ind, y_ind, time_ind)])]
     z_bott_vals = mtrx_bott[as.matrix(df_var[, .(x_ind, y_ind, time_ind)])]
@@ -154,23 +156,36 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
                   z_bott = NULL)]
     
     # Extract value for specified depth
+    if(!is.null(depth)){
+      the_depths = depth
+    }else if(!is.null(profile_interval)){
+      the_depths = seq(0, min(df_var$depth_bott), by = -abs(profile_interval))
+    }
+    
     if(is.null(transect)){
-      df_var = df_var[, .(depth = depth,
+      df_var = df_var[, .(depth = the_depths,
                           val = extract_from_profile(vals = val,
                                                      depths = depth_rel_surf,
-                                                     the_depth = depth,
+                                                     depths_out = the_depths,
                                                      depth_bott = unique(depth_bott))),
                       by = .(time_ind, x, y)]
     }else{
-      df_var = df_var[, .(depth = depth,
+      df_var = df_var[, .(depth = the_depths,
                           x = unique(x),
                           y = unique(y),
                           val = extract_from_profile(vals = val,
                                                      depths = depth_rel_surf,
-                                                     the_depth = depth,
+                                                     depths_out = the_depths,
                                                      depth_bott = unique(depth_bott))),
                       by = .(time_ind, transect_id)]
     }
+  }
+  
+  # Second time removing NA values
+  df_var = df_var[!is.na(val)]
+  if(nrow(df_var) == 0L){
+    message("No data on this location.")
+    return(df_var)
   }
   
   df_var[, `:=`(x = as.numeric(x),
