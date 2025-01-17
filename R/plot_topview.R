@@ -26,7 +26,7 @@ plot_topview = function(df, var, col_x = "x", col_y = "y", na_colour = "white", 
   }
   
   the_palette = list(...)[["palette"]]
-  if(!is.null(the_palette)){
+  if(is.null(the_palette)){
     the_palette = "Blues"
   }
   
