@@ -117,7 +117,7 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
       rbindlist(lst_mtrx_t)
     })
     df_var = rbindlist(lst_mtrx)
-    setorder(df_var, time_ind, x, y, z)
+    setorder(df_var, transect_id, time_ind, x, y, z)
     
     # Need to add x_ind and y_ind
     df_var[, `:=`(x_ind = sapply(df_var$x, function(ind) get_ind(ind, x_dim)),
@@ -154,12 +154,23 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
                   z_bott = NULL)]
     
     # Extract value for specified depth
-    df_var = df_var[, .(depth = depth,
-                        val = extract_from_profile(vals = val,
-                                                   depths = depth_rel_surf,
-                                                   the_depth = depth,
-                                                   depth_bott = unique(depth_bott))),
-                    by = .(time_ind, x, y)]
+    if(is.null(transect)){
+      df_var = df_var[, .(depth = depth,
+                          val = extract_from_profile(vals = val,
+                                                     depths = depth_rel_surf,
+                                                     the_depth = depth,
+                                                     depth_bott = unique(depth_bott))),
+                      by = .(time_ind, x, y)]
+    }else{
+      df_var = df_var[, .(depth = depth,
+                          x = unique(x),
+                          y = unique(y),
+                          val = extract_from_profile(vals = val,
+                                                     depths = depth_rel_surf,
+                                                     the_depth = depth,
+                                                     depth_bott = unique(depth_bott))),
+                      by = .(time_ind, transect_id)]
+    }
   }
   
   df_var[, `:=`(x = as.numeric(x),
@@ -173,10 +184,15 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
   cols_to_keep = c("time_ind", "x", "y")
   if("z" %in% names(df_var)) cols_to_keep = c(cols_to_keep, "z")
   if("depth" %in% names(df_var)) cols_to_keep = c(cols_to_keep, "depth")
+  if(!is.null(transect)) cols_to_keep = c(cols_to_keep, "transect_id")
   cols_to_keep = c(cols_to_keep, "val")
   
   df_var = df_var[, ..cols_to_keep]
-  setorder(df_var, "x", "y", "time_ind")
+  if(is.null(transect)){
+    setorder(df_var, "time_ind", "x", "y")
+  }else{
+    setorder(df_var, "time_ind", "transect_id")
+  }
   
   return(df_var)
 }
