@@ -30,7 +30,7 @@ plot_sideview = function(df, var, col_id = "transect_id", col_depth = "depth", s
   if(!(col_id %in% names(df))) stop(col_id, " must be one of the columns in 'df'!")
   
   if(!(col_depth %in% names(df))){
-    stop("No valied depth-column provided, nor a valid z-column!")
+    stop("No valid depth-column provided, nor a valid z-column!")
   }
   
   if(!is.null(surface_lvl)){
