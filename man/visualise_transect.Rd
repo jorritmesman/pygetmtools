@@ -5,9 +5,21 @@
 \alias{visualize_transect}
 \title{Plot a transect}
 \usage{
-visualise_transect(transect, bathy_nc, single_point_colour = TRUE, ...)
+visualise_transect(
+  transect,
+  bathy_nc,
+  single_point_colour = TRUE,
+  na_colour = "white",
+  ...
+)
 
-visualize_transect(transect, bathy_nc, single_point_colour = TRUE, ...)
+visualize_transect(
+  transect,
+  bathy_nc,
+  single_point_colour = TRUE,
+  na_colour = "white",
+  ...
+)
 }
 \arguments{
 \item{transect}{data.table; a data.table with columns 'x', and 'y'.}

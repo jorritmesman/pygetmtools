@@ -19,7 +19,7 @@
 #' @import ncdf4
 #' @export
 
-visualise_transect = function(transect, bathy_nc, single_point_colour = TRUE, ...){
+visualise_transect = function(transect, bathy_nc, single_point_colour = TRUE, na_colour = "white", ...){
   ### Add a transect id
   if(!("transect_id" %in% names(transect))){
     transect[, transect_id := 1:.N]
@@ -77,4 +77,4 @@ visualise_transect = function(transect, bathy_nc, single_point_colour = TRUE, ..
 
 #' @export
 #' @rdname visualise_transect
-visualize_transect <- visualise_transect
+visualize_transect = visualise_transect
