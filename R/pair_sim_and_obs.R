@@ -1,9 +1,8 @@
 #' Pair simulations and observations
 #'
-#' @details
-#'   Create tables in which GETM simulations and observations are paired. The 
-#'   observations refer to a specific time and location, which are extracted from
-#'   the netcdf outputs. 
+#' Create tables in which GETM simulations and observations are paired. The 
+#' observations refer to a specific time and location, which are extracted from
+#' the netcdf outputs. 
 #'
 #' @param ncs  character; names of the output nc file
 #' @param obs character; name of the observation file (csv format)

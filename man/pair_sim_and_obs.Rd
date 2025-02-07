@@ -38,12 +38,9 @@ from an observation (e.g. 'days(2)'). default = 1 day. If NULL, closest point is
 exact date/time matches are used.}
 }
 \description{
-Pair simulations and observations
-}
-\details{
 Create tables in which GETM simulations and observations are paired. The 
-  observations refer to a specific time and location, which are extracted from
-  the netcdf outputs.
+observations refer to a specific time and location, which are extracted from
+the netcdf outputs.
 }
 \examples{
  \dontrun{
