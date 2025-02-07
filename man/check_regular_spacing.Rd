@@ -14,7 +14,7 @@ check_regular_spacing(
 \arguments{
 \item{df}{data.table}
 
-\item{col_date, col_id, col_depth}{charcter; column names, 'col_depth' is grouped by 'col_date' and 'col_id'.}
+\item{col_date, col_id, col_depth}{character; column names, 'col_depth' is grouped by 'col_date' and 'col_id'.}
 }
 \description{
 Checks if for each unique combination of 'id' and 'date', depths are regularly spaced
