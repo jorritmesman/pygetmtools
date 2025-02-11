@@ -68,12 +68,13 @@ pair_sim_and_obs = function(ncs, obs, list_vars,
   
   # Add nc file with closest observation, incl. max_time_diff
   df_dates[, sim_date := date]
-  df_obs = df_dates[df_obs, roll = "nearest", on = "date"]
+  setnames(df_dates, old = "date", new = col_date)
+  df_obs = df_dates[df_obs, roll = "nearest", on = col_date]
   
   if(identical(max_time_diff, "exact")){
-    df_obs[!(date == sim_date), nc := NA]
+    df_obs[!(get(col_date) == sim_date), nc := NA]
   }else if(!is.null(max_time_diff)){
-    df_obs[abs(difftime(date, sim_date)) > max_time_diff, nc := NA]
+    df_obs[abs(difftime(get(col_date), sim_date)) > max_time_diff, nc := NA]
   }
   
   ncs_to_read = unique(df_obs[!is.na(nc), nc])
