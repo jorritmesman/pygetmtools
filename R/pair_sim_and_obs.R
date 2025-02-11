@@ -25,7 +25,7 @@
 #'    list_vars = list(temp = "temp",
 #'                     salt = "salinity")
 #'    
-#'    pair_sim_and_obs(ncs = ncs, obs = obs, list_vars = list_vars)
+#'    pair_sim_and_obs(ncs = ncs, obs = obs, list_vars = list_vars, max_time_diff = max_time_diff)
 #'  }
 #' @import ncdf4 lubridate
 #' @export
@@ -63,8 +63,11 @@ pair_sim_and_obs = function(ncs, obs, list_vars,
                nc = x)
   })
   df_dates = rbindlist(lst_dates)
-  setorder(df_dates, date)
-  if(any(duplicated(df_dates$date))) stop("Multiple nc files with same date!")
+  setorder(df_dates, date, nc)
+  if(any(duplicated(df_dates$date))){
+    message("Multiple nc files with same date detected; taking last provided file.")
+    df_dates = df_dates[duplicated(date, fromLast = T) == FALSE]
+  } 
   
   # Add nc file with closest observation, incl. max_time_diff
   df_dates[, sim_date := date]

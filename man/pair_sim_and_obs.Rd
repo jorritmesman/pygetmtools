@@ -50,7 +50,7 @@ the netcdf outputs.
    list_vars = list(temp = "temp",
                     salt = "salinity")
    
-   pair_sim_and_obs(ncs = ncs, obs = obs, list_vars = list_vars)
+   pair_sim_and_obs(ncs = ncs, obs = obs, list_vars = list_vars, max_time_diff = max_time_diff)
  }
 }
 \author{
