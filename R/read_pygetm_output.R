@@ -83,10 +83,17 @@ read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = N
     dim(m_all) = c(dim(m_all), 1)
     dim(m_zct) = c(dim(m_zct), 1)
     dim(m_zft) = c(dim(m_zft), 1)
+    add_dim = T # Need to re-add time-dimension to m_lvl_surf and ._bott
+  }else{
+    add_dim = F
   }
   m_lvl_surf = m_zft[,, dim(m_all)[3] + 1,] # Height of surface
   m_lvl_bott = m_zft[,, 1,] # Height of bottom
   rm(m_zft)
+  if(add_dim){
+    dim(m_lvl_surf) = c(dim(m_lvl_surf), 1)
+    dim(m_lvl_bott) = c(dim(m_lvl_bott), 1)
+  }
   
   df_var = slice_matrix(m_all, x_dim = x_dim, y_dim = y_dim,
                         x = x, y = y, depth = depth, z = z,
