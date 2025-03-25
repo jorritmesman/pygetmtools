@@ -16,6 +16,10 @@ Imports:
     ncdf4,
 	lubridate,
 	ggplot2
+	reshape2
+	plotly
+	viridis
+	htmlwidgets
 Encoding: UTF-8
 LazyData: true
 LazyLoad: true
