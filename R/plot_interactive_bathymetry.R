@@ -15,13 +15,12 @@
 #'  }
 #' @import ncdf4
 #' @import ggplot2
-#' @import reshape2
 #' @import plotly
 #' @import viridis
 #' @import htmlwidgets
 #' @export
 
-plot_interactive_bathymetry = function(ncdf, bathy_name = "bathymetry", coord_type = c("indices", "projected", "geographic")) {
+plot_interactive_bathymetry = function(ncdf, bathy_name = "bathymetry", coord_type = c("indices", "projected", "geographic")){
   
   nc_file = nc_open(ncdf)
   bath = ncvar_get(nc_file, bathy_name)
@@ -64,7 +63,15 @@ plot_interactive_bathymetry = function(ncdf, bathy_name = "bathymetry", coord_ty
     stop("Invalid argument for 'coord_type'!")
   }
   
-  bath_df = reshape2::melt(bath, varnames = coord_names, value.name = "depth")
+  # Melt (base-R style)
+  bath_df = data.frame(
+    expand.grid(lapply(dim(bath), seq_len)),
+    value = as.vector(bath)
+  )
+  names(bath_df) = c(coord_names, "depth")
+  
+  # # Original code (caused conflict with dt melt)
+  # bath_df2 = reshape2::melt(bath, varnames = coord_names, value.name = "depth")
   
   if (coord_type == "projected" | coord_type == "indices") {
     bath_df$x = x_coord[bath_df$x]
@@ -74,15 +81,11 @@ plot_interactive_bathymetry = function(ncdf, bathy_name = "bathymetry", coord_ty
     bath_df$lat = lat_coord[bath_df$lat]
   }
   
-  
-  
-  
   bath_df$hover_text = paste0(
     coord_labels[1], ": ", round(bath_df[[coord_names[1]]], 5), "<br>",
     coord_labels[2], ": ", round(bath_df[[coord_names[2]]], 5), "<br>",
     "Depth: ", round(bath_df$depth, 5)
   )
-  
   
   p = ggplot(bath_df, aes(
     x = .data[[coord_names[1]]],
@@ -116,4 +119,3 @@ plot_interactive_bathymetry = function(ncdf, bathy_name = "bathymetry", coord_ty
   
   return(interactive_plot)
 }
-
