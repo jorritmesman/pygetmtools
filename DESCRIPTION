@@ -2,7 +2,7 @@ Package: pygetmtools
 Type: Package
 Title: Tools for working with PyGETM input and output data
 Version: 0.0.1
-Date: 2025-01-10
+Date: 2025-05-14
 URL: https://github.com/jorritmesman/pygetmtools
 Author: Authors@R: c(person("Jorrit", "Mesman", role = c("aut","cre"),
     email = "jorrit.mesman@ebc.uu.se"))
@@ -18,7 +18,9 @@ Imports:
 	ggplot2,
 	plotly,
 	viridis,
-	htmlwidgets
+	htmlwidgets,
+	ggpubr,
+	yaml
 Encoding: UTF-8
 LazyData: true
 LazyLoad: true
