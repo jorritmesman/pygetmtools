@@ -4,12 +4,14 @@
 \alias{get_ind}
 \title{Get index of closest value in a vector}
 \usage{
-get_ind(val, vctr)
+get_ind(val, vctr, rule = "error")
 }
 \arguments{
 \item{val}{numeric; a value}
 
 \item{vctr}{numeric; vector of values, should be ordered}
+
+\item{rule}{character; what to do if a vector is outside the range}
 }
 \description{
 Get index of closest value in a vector, and throw error if the value is out of range.
