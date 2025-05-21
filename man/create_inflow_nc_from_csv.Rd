@@ -16,17 +16,14 @@ create_inflow_nc_from_csv(
 )
 }
 \arguments{
-\item{filename}{character; Point to csv file with headers ("date", "flow", and any constituents)
-"date" needs to have format "%Y-%m-%d %H:%M:%S" and "flow" m3/s}
+\item{filename}{character; Point to csv file with headers ('date', 'flow', and any constituents).
+'date' needs to have format '%Y-%m-%d %H:%M:%S' and 'flow' m3/s}
 
-\item{lat}{numeric; latitude in decimal degrees (north)}
-
-\item{lon}{numeric; longitude in decimal degrees (east)}
+\item{lat, lon}{numeric; latitude and longitude in decimal degrees (north/east)}
 
 \item{file_out}{character; path to output netcdf file}
 
-\item{fabmyaml}{character; path to fabm.yaml file used for simulation. If provided, will check
-the constituents in the file}
+\item{fabmyaml}{character; path to fabm.yaml file used for simulation. If provided, will check the constituents in the file}
 
 \item{timestep}{character; interpretable by seq.POSIXct}
 
@@ -35,33 +32,30 @@ the constituents in the file}
 \item{plot}{logical; if true, makes a plot of the output that was written}
 }
 \description{
-Create a PyGETM inflow netcdf file
+Create a netcdf inflow file that can be interpreted with the 'pygetm.input.from_nc' python function.
 }
 \details{
-Create a netcdf inflow file that can be interpreted with the pygetm.input.from_nc
-  python function.
-  
-  Important: any flow constituent that is added needs to have been
-  initialised in the FABM yaml file and it's assumed to be the same name
-  in the header as in the model; you can add a fabm.yaml file to check.
-  
-  The time series added can be, but do not have to be continuous; the script
-  will create a continuous series using the 'timestep' argument and linear
-  interpolation.
-  
-  Note that this script does not add units to the created netcdf file. Ensure
-  that the unit of the input is the same as that is used by PyGETM. For tracers,
-  the unit may be arbitrary, but PyGETM will use the same unit as is in the inflow
+Important: any flow constituent that is added needs to have been
+initialised in the FABM yaml file and it's assumed to be the same name
+in the header as in the model; you can add a fabm.yaml file to check.
+
+The time series added can be, but do not have to be continuous; the script
+will create a continuous series using the 'timestep' argument and linear
+interpolation.
+
+Note that this script does not add units to the created netcdf file. Ensure
+that the unit of the input is the same as that is used by PyGETM. For tracers,
+the unit may be arbitrary, but PyGETM will use the same unit as is in the inflow
 }
 \examples{
  \dontrun{
  # "inflow_tracer.csv" has columns "date", "flow", and "tracer_c"
  # "tracer_c" is present in a fabm.yaml file associated with a PyGETM simulation
  create_inflow_nc_from_csv(filename = "inflow_tracer.csv",
-                           lat = 62.65,
-                           lon = -97.79,
-                           file_out = "Tracer_file_1.nc",
-                           timestep = "1 day")
+ lat = 62.65,
+ lon = -97.79,
+ file_out = "Tracer_file_1.nc",
+ timestep = "1 day")
  }
 }
 \author{

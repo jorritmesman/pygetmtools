@@ -1,42 +1,40 @@
 #' Create a PyGETM inflow netcdf file
-#'
+#' 
+#' @description
+#' Create a netcdf inflow file that can be interpreted with the 'pygetm.input.from_nc' python function.
+#' 
 #' @details
-#'   Create a netcdf inflow file that can be interpreted with the pygetm.input.from_nc
-#'   python function.
-#'   
-#'   Important: any flow constituent that is added needs to have been
-#'   initialised in the FABM yaml file and it's assumed to be the same name
-#'   in the header as in the model; you can add a fabm.yaml file to check.
-#'   
-#'   The time series added can be, but do not have to be continuous; the script
-#'   will create a continuous series using the 'timestep' argument and linear
-#'   interpolation.
-#'   
-#'   Note that this script does not add units to the created netcdf file. Ensure
-#'   that the unit of the input is the same as that is used by PyGETM. For tracers,
-#'   the unit may be arbitrary, but PyGETM will use the same unit as is in the inflow
-#'
-#' @param filename character; Point to csv file with headers ("date", "flow", and any constituents)
-#'   "date" needs to have format "%Y-%m-%d %H:%M:%S" and "flow" m3/s
-#' @param lat numeric; latitude in decimal degrees (north)
-#' @param lon numeric; longitude in decimal degrees (east)
+#' Important: any flow constituent that is added needs to have been
+#' initialised in the FABM yaml file and it's assumed to be the same name
+#' in the header as in the model; you can add a fabm.yaml file to check.
+#' 
+#' The time series added can be, but do not have to be continuous; the script
+#' will create a continuous series using the 'timestep' argument and linear
+#' interpolation.
+#' 
+#' Note that this script does not add units to the created netcdf file. Ensure
+#' that the unit of the input is the same as that is used by PyGETM. For tracers,
+#' the unit may be arbitrary, but PyGETM will use the same unit as is in the inflow
+#' 
+#' @param filename character; Point to csv file with headers ('date', 'flow', and any constituents).
+#' 'date' needs to have format '%Y-%m-%d %H:%M:%S' and 'flow' m3/s
+#' @param lat,lon numeric; latitude and longitude in decimal degrees (north/east)
 #' @param file_out character; path to output netcdf file
-#' @param fabmyaml character; path to fabm.yaml file used for simulation. If provided, will check
-#'   the constituents in the file
+#' @param fabmyaml character; path to fabm.yaml file used for simulation. If provided, will check the constituents in the file
 #' @param timestep character; interpretable by seq.POSIXct
 #' @param origin_getm character; %Y-%m-%d format, time origin used in GETM nc file
 #' @param plot logical; if true, makes a plot of the output that was written
 #' @author
-#'   Jorrit Mesman
+#' Jorrit Mesman
 #' @examples
 #'  \dontrun{
 #'  # "inflow_tracer.csv" has columns "date", "flow", and "tracer_c"
 #'  # "tracer_c" is present in a fabm.yaml file associated with a PyGETM simulation
 #'  create_inflow_nc_from_csv(filename = "inflow_tracer.csv",
-#'                            lat = 62.65,
-#'                            lon = -97.79,
-#'                            file_out = "Tracer_file_1.nc",
-#'                            timestep = "1 day")
+#'  lat = 62.65,
+#'  lon = -97.79,
+#'  file_out = "Tracer_file_1.nc",
+#'  timestep = "1 day")
 #'  }
 #' @import ncdf4
 #' @import lubridate
