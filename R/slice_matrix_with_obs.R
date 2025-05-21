@@ -6,9 +6,10 @@
 #'   is done. This function is for internal use in pair_sim_and_obs.R. 
 #'
 #' @param mtrx  matrix; matrix of the variable to extract. Result of ncdf4::ncvar_get(...)
-#' @param mtrx_zft matrix: matrix of 'zft'. Result of ncdf4::ncvar_get(...)
+#' @param mtrx_zft matrix; matrix of 'zft'. Result of ncdf4::ncvar_get(...)
 #' @param x_dim,y_dim numeric; vector of the values of the 'x' and 'y' dimensions
 #' @param time_dim POSIXct; vector of the values of the 'time' dimension in the nc file
+#' @param observations data.table; has columns on coordinates, depths, and values
 #' @param col_x,col_y,col_depth character; column names in 'observations' for the dimensions
 #' @param sim_date character; column name of the simulation date
 #' @param save_z logical; Whether to save the z-layer from which simulation value was extracted.

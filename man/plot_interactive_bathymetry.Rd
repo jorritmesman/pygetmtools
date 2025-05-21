@@ -13,6 +13,8 @@ plot_interactive_bathymetry(
 \arguments{
 \item{ncdf}{Character. Path to the NetCDF bathymetry file.}
 
+\item{bathy_name}{Character. Name of the bathymetry variable in the ncdf}
+
 \item{coord_type}{Character. One of 'projected', 'geographic', or 'indices'. The type of coordinates to display in the plot.}
 }
 \description{

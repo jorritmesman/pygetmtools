@@ -26,6 +26,10 @@ visualize_transect(
 
 \item{bathy_nc}{character; name of the bathymetry nc file that is used as input into PyGETM}
 
+\item{single_point_colour}{logical; if TRUE, all points are plotted in the same colour}
+
+\item{na_colour}{character; NA values are set to this colour}
+
 \item{...}{Other parameters are fed into the 'labs()' function, and 'palette' can also be specified}
 }
 \description{

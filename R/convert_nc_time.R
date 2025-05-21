@@ -5,6 +5,7 @@
 #' 
 #' @param time_vals numeric; returned by ncdf4::ncvar_get()
 #' @param time_att list; returned by ncdf4::ncatt_get().
+#' @param tz character; time zone, accepted by as.POSIXct. Defaults to UTC
 #' @export
 
 convert_nc_time = function(time_vals, time_att, tz = "UTC"){

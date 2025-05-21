@@ -1,7 +1,7 @@
 #' Create a PyGETM inflow netcdf file
 #' 
 #' @description
-#' Create a netcdf inflow file that can be interpreted with the 'pygetm.input.from_nc' python function.
+#' Create a netcdf inflow file that can be interpreted with the 'pygetm.input.from_nc' python function
 #' 
 #' @details
 #' Important: any flow constituent that is added needs to have been
@@ -17,24 +17,24 @@
 #' the unit may be arbitrary, but PyGETM will use the same unit as is in the inflow
 #' 
 #' @param filename character; Point to csv file with headers ('date', 'flow', and any constituents).
-#' 'date' needs to have format '%Y-%m-%d %H:%M:%S' and 'flow' m3/s
+#' 'date' needs to have format 'yyyy-mm-dd hh:mm:ss' and 'flow' must be in m3/s
 #' @param lat,lon numeric; latitude and longitude in decimal degrees (north/east)
 #' @param file_out character; path to output netcdf file
 #' @param fabmyaml character; path to fabm.yaml file used for simulation. If provided, will check the constituents in the file
 #' @param timestep character; interpretable by seq.POSIXct
-#' @param origin_getm character; %Y-%m-%d format, time origin used in GETM nc file
+#' @param origin_getm character; 'yyyy-mm-dd hh:mm:ss' format, time origin used in GETM nc file
 #' @param plot logical; if true, makes a plot of the output that was written
 #' @author
 #' Jorrit Mesman
 #' @examples
 #'  \dontrun{
-#'  # "inflow_tracer.csv" has columns "date", "flow", and "tracer_c"
-#'  # "tracer_c" is present in a fabm.yaml file associated with a PyGETM simulation
-#'  create_inflow_nc_from_csv(filename = "inflow_tracer.csv",
-#'  lat = 62.65,
-#'  lon = -97.79,
-#'  file_out = "Tracer_file_1.nc",
-#'  timestep = "1 day")
+#'   # "inflow_tracer.csv" has columns "date", "flow", and "tracer_c"
+#'   # "tracer_c" is present in a fabm.yaml file associated with a PyGETM simulation
+#'   create_inflow_nc_from_csv(filename = "inflow_tracer.csv",
+#'   lat = 62.65,
+#'   lon = -97.79,
+#'   file_out = "Tracer_file_1.nc",
+#'   timestep = "1 day")
 #'  }
 #' @import ncdf4
 #' @import lubridate

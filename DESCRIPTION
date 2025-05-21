@@ -22,7 +22,5 @@ Imports:
 	ggpubr,
 	yaml
 Encoding: UTF-8
-LazyData: true
 LazyLoad: true
 RoxygenNote: 7.3.2
-VignetteBuilder: knitr

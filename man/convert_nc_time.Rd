@@ -10,6 +10,8 @@ convert_nc_time(time_vals, time_att, tz = "UTC")
 \item{time_vals}{numeric; returned by ncdf4::ncvar_get()}
 
 \item{time_att}{list; returned by ncdf4::ncatt_get().}
+
+\item{tz}{character; time zone, accepted by as.POSIXct. Defaults to UTC}
 }
 \description{
 Converts netcdf time from numerical values to POSIXct, when providing values and attributes. The

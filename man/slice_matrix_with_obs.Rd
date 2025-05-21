@@ -21,11 +21,13 @@ slice_matrix_with_obs(
 \arguments{
 \item{mtrx}{matrix; matrix of the variable to extract. Result of ncdf4::ncvar_get(...)}
 
-\item{mtrx_zft}{matrix: matrix of 'zft'. Result of ncdf4::ncvar_get(...)}
+\item{mtrx_zft}{matrix; matrix of 'zft'. Result of ncdf4::ncvar_get(...)}
 
 \item{x_dim, y_dim}{numeric; vector of the values of the 'x' and 'y' dimensions}
 
 \item{time_dim}{POSIXct; vector of the values of the 'time' dimension in the nc file}
+
+\item{observations}{data.table; has columns on coordinates, depths, and values}
 
 \item{col_x, col_y, col_depth}{character; column names in 'observations' for the dimensions}
 

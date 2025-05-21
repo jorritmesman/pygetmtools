@@ -6,6 +6,7 @@
 #'   The coordinates can be geographic ('lon', 'lat' in degrees), projected ('x', 'y' in meters), or grid indices ('i', 'j').
 #'
 #' @param ncdf Character. Path to the NetCDF bathymetry file.
+#' @param bathy_name Character. Name of the bathymetry variable in the ncdf
 #' @param coord_type Character. One of 'projected', 'geographic', or 'indices'. The type of coordinates to display in the plot.
 #' @author
 #'   Muhammed Shikhani

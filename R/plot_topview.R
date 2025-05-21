@@ -5,6 +5,7 @@
 #' @param df data.table; a data.table with columns that are specified in 'col_x', 'col_y', and 'var'.
 #' @param var character; column name in 'df', to be plotted in colour
 #' @param col_x,col_y character; column names of 'x' and 'y' coordinates
+#' @param na_colour character; NA values are set to this colour. 
 #' @param ... Other parameters are fed into the 'labs()' function, and 'palette' can also be specified
 #' 
 #' @author

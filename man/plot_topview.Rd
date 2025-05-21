@@ -13,6 +13,8 @@ plot_topview(df, var, col_x = "x", col_y = "y", na_colour = "white", ...)
 
 \item{col_x, col_y}{character; column names of 'x' and 'y' coordinates}
 
+\item{na_colour}{character; NA values are set to this colour.}
+
 \item{...}{Other parameters are fed into the 'labs()' function, and 'palette' can also be specified}
 }
 \description{
