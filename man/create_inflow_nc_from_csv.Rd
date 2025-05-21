@@ -19,7 +19,9 @@ create_inflow_nc_from_csv(
 \item{file}{character; Point to csv file with headers ("date", "flow", and any constituents)
 "date" needs to have format "%Y-%m-%d %H:%M:%S" and "flow" m3/s}
 
-\item{lat, lon}{numeric; latitude and longitude in decimal degrees (north/east)}
+\item{lat}{numeric; latitude in decimal degrees (north)}
+
+\item{lon}{numeric; longitude in decimal degrees (east)}
 
 \item{file_out}{character; path to output netcdf file}
 

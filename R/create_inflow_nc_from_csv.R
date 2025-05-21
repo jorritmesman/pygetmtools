@@ -18,7 +18,8 @@
 #'
 #' @param file character; Point to csv file with headers ("date", "flow", and any constituents)
 #'    "date" needs to have format "%Y-%m-%d %H:%M:%S" and "flow" m3/s
-#' @param lat,lon numeric; latitude and longitude in decimal degrees (north/east)
+#' @param lat numeric; latitude in decimal degrees (north)
+#' @param lon numeric; longitude in decimal degrees (east)
 #' @param file_out character; path to output netcdf file
 #' @param fabmyaml character; path to fabm.yaml file used for simulation. If provided, will check
 #'    the constituents in the file
