@@ -44,10 +44,10 @@
 #' @import ggpubr
 #' @export
 
-create_inflow_nc = function(file, lat, lon, file_out,
-                            fabmyaml = NULL, timestep = "1 hour",
-                            origin_getm = "1900-01-01 00:00:00",
-                            plot = FALSE){
+create_inflow_nc_from_csv = function(file, lat, lon, file_out,
+                                     fabmyaml = NULL, timestep = "1 hour",
+                                     origin_getm = "1900-01-01 00:00:00",
+                                     plot = FALSE){
   # Read file
   df = fread(file)
   
