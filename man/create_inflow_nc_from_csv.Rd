@@ -5,7 +5,7 @@
 \title{Create a PyGETM inflow netcdf file}
 \usage{
 create_inflow_nc_from_csv(
-  file,
+  filename,
   lat,
   lon,
   file_out,
@@ -16,7 +16,7 @@ create_inflow_nc_from_csv(
 )
 }
 \arguments{
-\item{file}{character; Point to csv file with headers ("date", "flow", and any constituents)
+\item{filename}{character; Point to csv file with headers ("date", "flow", and any constituents)
 "date" needs to have format "%Y-%m-%d %H:%M:%S" and "flow" m3/s}
 
 \item{lat}{numeric; latitude in decimal degrees (north)}
@@ -57,7 +57,7 @@ Create a netcdf inflow file that can be interpreted with the pygetm.input.from_n
  \dontrun{
  # "inflow_tracer.csv" has columns "date", "flow", and "tracer_c"
  # "tracer_c" is present in a fabm.yaml file associated with a PyGETM simulation
- create_inflow_nc_from_csv(file = "inflow_tracer.csv",
+ create_inflow_nc_from_csv(filename = "inflow_tracer.csv",
                            lat = 62.65,
                            lon = -97.79,
                            file_out = "Tracer_file_1.nc",

@@ -16,13 +16,13 @@
 #'   that the unit of the input is the same as that is used by PyGETM. For tracers,
 #'   the unit may be arbitrary, but PyGETM will use the same unit as is in the inflow
 #'
-#' @param file character; Point to csv file with headers ("date", "flow", and any constituents)
-#'    "date" needs to have format "%Y-%m-%d %H:%M:%S" and "flow" m3/s
+#' @param filename character; Point to csv file with headers ("date", "flow", and any constituents)
+#'   "date" needs to have format "%Y-%m-%d %H:%M:%S" and "flow" m3/s
 #' @param lat numeric; latitude in decimal degrees (north)
 #' @param lon numeric; longitude in decimal degrees (east)
 #' @param file_out character; path to output netcdf file
 #' @param fabmyaml character; path to fabm.yaml file used for simulation. If provided, will check
-#'    the constituents in the file
+#'   the constituents in the file
 #' @param timestep character; interpretable by seq.POSIXct
 #' @param origin_getm character; %Y-%m-%d format, time origin used in GETM nc file
 #' @param plot logical; if true, makes a plot of the output that was written
@@ -32,7 +32,7 @@
 #'  \dontrun{
 #'  # "inflow_tracer.csv" has columns "date", "flow", and "tracer_c"
 #'  # "tracer_c" is present in a fabm.yaml file associated with a PyGETM simulation
-#'  create_inflow_nc_from_csv(file = "inflow_tracer.csv",
+#'  create_inflow_nc_from_csv(filename = "inflow_tracer.csv",
 #'                            lat = 62.65,
 #'                            lon = -97.79,
 #'                            file_out = "Tracer_file_1.nc",
@@ -45,21 +45,21 @@
 #' @import ggpubr
 #' @export
 
-create_inflow_nc_from_csv = function(file, lat, lon, file_out,
+create_inflow_nc_from_csv = function(filename, lat, lon, file_out,
                                      fabmyaml = NULL, timestep = "1 hour",
                                      origin_getm = "1900-01-01 00:00:00",
                                      plot = FALSE){
   # Read file
-  df = fread(file)
+  df = fread(filename)
   
-  # Check validity of file
+  # Check validity of filename
   if(!("date" %in% names(df) & "flow" %in% names(df))){
-    stop("'file' needs to have, at least, a column named 'date' and a column ",
+    stop("'filename' needs to have, at least, a column named 'date' and a column ",
          "named 'flow'!")
   }
   
   if(any(duplicated(df$date))){
-    stop("Duplicated dates detected in 'file'! If you want to add sudden changes ",
+    stop("Duplicated dates detected in 'filename'! If you want to add sudden changes ",
          " in the file, ensure that this works with the 'timestep' argument to ",
          "this function.")
   }
