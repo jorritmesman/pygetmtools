@@ -12,7 +12,9 @@
 #'   points and still fulfill the smoothing criteria. Either step is optional.
 #'   
 #'   Smoothing is foremost an iterative process. Start with a certain parameter
-#'   set and plot the results using 'plot_bathy' and then adjust. 
+#'   set and plot the results using 'plot_bathy' and then adjust. The common workflow
+#'   is: 'read_bathy_as_matrix', (iteratively) 'smooth_bathy_matrix' & 'plot_bathy', then
+#'   'add_bathy_to_ncdf'.
 #' @param mtrx  matrix; numeric matrix, describing a bathymetry
 #' @param maintain_coords data.table; should have columns 'ind_x' and 'ind_y', which
 #'   should correspond to values in 'mtrx' that should not be affected by the smoothing.
