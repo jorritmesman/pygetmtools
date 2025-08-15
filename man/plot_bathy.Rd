@@ -4,7 +4,13 @@
 \alias{plot_bathy}
 \title{Plot a bathymetry}
 \usage{
-plot_bathy(mtrx, mtrx_ref = NULL, rev_x = FALSE, rev_y = FALSE)
+plot_bathy(
+  mtrx,
+  mtrx_ref = NULL,
+  rev_x = FALSE,
+  rev_y = FALSE,
+  maintain_coords = NULL
+)
 }
 \arguments{
 \item{mtrx}{matrix; numeric matrix, describing a bathymetry}
@@ -13,6 +19,8 @@ plot_bathy(mtrx, mtrx_ref = NULL, rev_x = FALSE, rev_y = FALSE)
 plot will show the difference between mtrx - mtrx_ref. Default is NULL.}
 
 \item{rev_x, rev_y}{logical; if TRUE, will plot that axis in reverse}
+
+\item{maintain_coords}{data.table; has columns 'ind_x' and 'ind_y'}
 }
 \description{
 Plot a bathymetry
@@ -24,6 +32,9 @@ Creates a ggplot2 object that can be modified further.
   
   Either plots the bathymetry or, if 'bathy_ref' is provided, the difference
   between the two bathymetries.
+  
+  If a data.table with fixed coordinates is provided, this is plotted on top
+  of the map
   
   There is another version of this function - 'plot_interactive_bathymetry' - where
   you can check individual cell values in the RStudio viewer. That only works when

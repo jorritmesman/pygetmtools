@@ -18,7 +18,8 @@
 #' @param mtrx  matrix; numeric matrix, describing a bathymetry
 #' @param maintain_coords data.table; should have columns 'ind_x' and 'ind_y', which
 #'   should correspond to values in 'mtrx' that should not be affected by the smoothing.
-#'   If NULL, no points are maintained and only 'global' smoothing is applied.
+#'   If NULL, no points are maintained and only 'global' smoothing is applied. Can be
+#'   read from a csv with "x" and "y" coordinates using 'read_coord_maintain_file'
 #' @param max_val numeric; maximum allowed value of 'method'. Should always be positive.
 #' @param method character; 'diff' or 'rx0'. If 'diff', 'max_val' is interpreted as
 #'   the maximum (absolute) difference between adjacent cells. If 'rx0', 'max_val' is
@@ -134,7 +135,6 @@ smooth_bathy_matrix = function(mtrx, maintain_coords,
   }else{
     vol_imbal = 0.0
   }
-  
   
   # Local smoothing (only if maintain_coords are provided)
   if(!is.null(maintain_coords)){
@@ -331,7 +331,7 @@ handle_step = function(new_i, new_j, cell_orig){
   allowed_minimum = max(allowed_minimum, min_depth)
   
   if(allowed_maximum + margin < allowed_minimum){
-    stop("Impossible constraints for cell [", i, ", ", j, "]! Consider ",
+    stop("Impossible constraints for cell [", new_i, ", ", new_j, "]! Consider ",
          "different function arguments or maintain points that are further apart.")
   }
   

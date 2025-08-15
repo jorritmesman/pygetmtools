@@ -29,7 +29,8 @@ smooth_bathy_matrix(
 
 \item{maintain_coords}{data.table; should have columns 'ind_x' and 'ind_y', which
 should correspond to values in 'mtrx' that should not be affected by the smoothing.
-If NULL, no points are maintained and only 'global' smoothing is applied.}
+If NULL, no points are maintained and only 'global' smoothing is applied. Can be
+read from a csv with "x" and "y" coordinates using 'read_coord_maintain_file'}
 
 \item{max_val}{numeric; maximum allowed value of 'method'. Should always be positive.}
 
