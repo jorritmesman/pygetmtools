@@ -31,7 +31,7 @@ add_bathy_to_ncdf = function(mtrx, ncdf, depth_name_new,
   nc_close(nc)
   
   # Re-open in order to write values
-  nc = nc_open(bathy_nc, write = T)
+  nc = nc_open(ncdf, write = T)
   ncvar_put(nc, varid = depth_name_new, vals = mtrx)
   nc_close(nc)
 }
