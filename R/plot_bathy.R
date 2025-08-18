@@ -18,6 +18,8 @@
 #' @param mtrx  matrix; numeric matrix, describing a bathymetry
 #' @param mtrx_ref  matrix; numeric matrix, describing a bathymetry. If provided,
 #'   plot will show the difference between mtrx - mtrx_ref. Default is NULL.
+#' @param plot_slope_method character; "diff" or "rx0"; makes a map of the slope
+#'   parameter instead. Will ignore the 'mtrx_ref' argument. Default is NULL.
 #' @param rev_x,rev_y logical; if TRUE, will plot that axis in reverse
 #' @param maintain_coords data.table; has columns 'ind_x' and 'ind_y'
 #'   
@@ -35,16 +37,39 @@
 #' @import ggplot2
 #' @export
 
-plot_bathy = function(mtrx, mtrx_ref = NULL, rev_x = FALSE, rev_y = FALSE,
+plot_bathy = function(mtrx, mtrx_ref = NULL,
+                      plot_slope_method = NULL, rev_x = FALSE, rev_y = FALSE,
                       maintain_coords = NULL){
-  if(is.null(mtrx_ref)){
+  if(!is.null(plot_slope_method)){
+    if(is.logical(plot_slope_method)){
+      stop("'plot_slope_method' should be 'diff' or 'rx0'!")
+    }else if(!(plot_slope_method %in% c("diff", "rx0"))){
+      stop("'plot_slope_method' should be 'diff' or 'rx0'!")
+    }
+    mtrx_plot = mtrx
+    
+    for(i in seq_len(dim(mtrx_plot)[1])){
+      for(j in seq_len(dim(mtrx_plot)[2])){
+        if(plot_slope_method == "diff"){
+          mtrx_plot[i, j] = calc_max_diff(mtrx, i, j)
+        }else if(plot_slope_method == "rx0"){
+          mtrx_plot[i, j] = calc_max_rx0(mtrx, i, j)
+        }
+      }
+    }
+    df_plot = data.table(mtrx_plot)
+    colour_name = plot_slope_method
+  }else if(is.null(mtrx_ref)){
     df_plot = data.table(mtrx)
+    colour_name = "depth"
   }else{
     if(!identical(dim(mtrx), dim(mtrx_ref))){
       stop("'mtrx' and 'mtrx_ref' do not have the same dimensions!")
     }
     df_plot = data.table(mtrx - mtrx_ref)
+    colour_name = "depth diff."
   }
+  
   names(df_plot) = as.character(seq_len(ncol(df_plot)))
   df_plot[, x := seq_len(nrow(df_plot))]
   
@@ -60,10 +85,12 @@ plot_bathy = function(mtrx, mtrx_ref = NULL, rev_x = FALSE, rev_y = FALSE,
   }
   if(rev_x) p = p + scale_x_reverse()
   if(rev_y) p = p + scale_y_reverse()
-  if(!is.null(mtrx_ref)){
-    p = p + scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0.0)
+  if(!is.null(plot_slope_method) | is.null(mtrx_ref)){
+    p = p + scale_fill_gradient(low = "white", high = "blue",
+                                name = colour_name)
   }else{
-    p = p + scale_fill_gradient(low = "white", high = "blue")
+    p = p + scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0.0,
+                                 name = colour_name)
   }
   p = p + theme_light()
   

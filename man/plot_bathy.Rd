@@ -7,6 +7,7 @@
 plot_bathy(
   mtrx,
   mtrx_ref = NULL,
+  plot_slope_method = NULL,
   rev_x = FALSE,
   rev_y = FALSE,
   maintain_coords = NULL
@@ -17,6 +18,9 @@ plot_bathy(
 
 \item{mtrx_ref}{matrix; numeric matrix, describing a bathymetry. If provided,
 plot will show the difference between mtrx - mtrx_ref. Default is NULL.}
+
+\item{plot_slope_method}{character; "diff" or "rx0"; makes a map of the slope
+parameter instead. Will ignore the 'mtrx_ref' argument. Default is NULL.}
 
 \item{rev_x, rev_y}{logical; if TRUE, will plot that axis in reverse}
 
