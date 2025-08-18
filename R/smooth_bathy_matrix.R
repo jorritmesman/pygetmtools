@@ -19,8 +19,10 @@
 #'   file by 'read_bathy_as_matrix'.
 #' @param maintain_coords data.table; should have columns 'ind_x' and 'ind_y', which
 #'   should correspond to values in 'mtrx' that should not be affected by the smoothing.
-#'   If NULL, no points are maintained and only 'global' smoothing is applied. Can be
-#'   read from a csv with "x" and "y" coordinates using 'read_coord_maintain_file'
+#'   Optional column 'fix_depth'; any values filled here are used instead of the
+#'   original bathy's depth. If 'maintain_coords = NULL', no points are maintained
+#'   and only 'global' smoothing is applied. Can be read from a csv with "x" and "y"
+#'   coordinates using 'read_coord_maintain_file'.
 #' @param max_val numeric; maximum allowed value of 'method'. Should always be positive.
 #' @param method character; 'diff' or 'rx0'. If 'diff', 'max_val' is interpreted as
 #'   the maximum (absolute) difference between adjacent cells. If 'rx0', 'max_val' is
@@ -28,6 +30,12 @@
 #' @param track_volume logical; if TRUE, the algorithm strives to maintain the original
 #'   volume of the provided bathymetry. 
 #' @param min_depth numeric; minimum allowed depth (always positive). Defaults to 0.0
+#' @param optim_val numeric; only used in local smoothing. Similar to 'max_val' (using
+#'   'method' argument), but gives a "preferred" slope to use if this is possible.
+#'   Can be provided as a vector for different steps from the maintain_coords points.
+#'   for any distance further than provided by 'optim_val', the last argument
+#'   is used, so if you don't want further cells to be affected by optim_val, set the
+#'   last element of the vector to max_val. Default = NULL (i.e. 'optim_val' is not used). 
 #' @param global_smoothing logical; if TRUE, global smoothing is applied
 #' @param box_width_global integer; width of box used in global smoothing
 #' @param box_width_shallows integer; width of box used in global smoothing when assessing
@@ -75,9 +83,10 @@
 
 smooth_bathy_matrix = function(mtrx, maintain_coords, 
                         max_val,
-                        method = "diff",
+                        method = "rx0",
                         track_volume = TRUE,
                         min_depth = 0.0,
+                        optim_val = NULL,
                         global_smoothing = TRUE,
                         box_width_global = 4L,
                         box_width_shallows = 6L,
@@ -143,8 +152,18 @@ smooth_bathy_matrix = function(mtrx, maintain_coords,
     maintain_coords = maintain_coords[!is.na(ind_x) & !is.na(ind_y)]
     maintain_coords = maintain_coords[ind_x >= 0 & ind_x <= max_i & ind_y >= 0 & ind_y <= max_j]
     
+    if("fix_depth" %in% names(maintain_coords)){
+      maintain_coords[, fix_depth := as.numeric(fix_depth)]
+    }else{
+      maintain_coords[, fix_depth := as.numeric(NA)]
+    }
+    
     for(i in seq_len(nrow(maintain_coords))){
-      maintain_coords[i, orig_depth := mtrx[ind_x, ind_y]]
+      if(is.na(maintain_coords[i, fix_depth])){
+        maintain_coords[i, orig_depth := mtrx[ind_x, ind_y]]
+      }else{
+        maintain_coords[i, orig_depth := fix_depth]
+      }
     }
     if(any(is.na(maintain_coords[, orig_depth]))){
       warning("Some coordinates in maintain_coord refer to NA values! These are ignored.")
@@ -164,7 +183,7 @@ smooth_bathy_matrix = function(mtrx, maintain_coords,
     bathy_new[!is.na(bathy_new)] = -1 # This is code for "needs to be filled"
     bathy_origin = bathy_new
     for(i in seq_len(nrow(maintain_coords))){
-      bathy_new[maintain_coords[i, ind_x], maintain_coords[i, ind_y]] = mtrx[maintain_coords[i, ind_x], maintain_coords[i, ind_y]]
+      bathy_new[maintain_coords[i, ind_x], maintain_coords[i, ind_y]] = maintain_coords[i, orig_depth]
       bathy_origin[maintain_coords[i, ind_x], maintain_coords[i, ind_y]] = i
     }
     
@@ -351,12 +370,40 @@ handle_step = function(new_i, new_j, cell_orig){
     depth_optim = depth_optim - sign(vol_imbal) * max_vol_adj_step_local / 4 # /4 because of potentially four directions
   }
   
+  # Modify optimal depth using the optim_val parameter (only if it results in a gentler slope)
+  if(is.null(optim_val)){
+    depth_optim_slope = depth_optim
+  }else{
+    optim_slope = ifelse(dist_from_orig > length(optim_val), optim_val[length(optim_val)],
+                         optim_val[dist_from_orig])
+    if(optim_slope >= max_val | (depth_optim >= df_neighbours[1L, lowest] & depth_optim <= df_neighbours[1L, highest])){
+      depth_optim_slope = depth_optim
+    }else{
+      # Calculate a value based on the optimal slope
+      if(depth_optim > df_neighbours[1L, highest]){
+        if(method == "diff"){
+          depth_optim_slope = df_neighbours[1L, lowest] + optim_slope
+        }else if(method == "rx0"){
+          depth_optim_slope = rx0_inv(df_neighbours[1L, lowest], rx0 = optim_slope)
+        }
+        depth_optim_slope = min(depth_optim_slope, depth_optim)
+      }else{
+        if(method == "diff"){
+          depth_optim_slope = df_neighbours[1L, highest] - optim_slope
+        }else if(method == "rx0"){
+          depth_optim_slope = rx0_inv(df_neighbours[1L, highest], rx0 = optim_slope, sign = -1)
+        }
+        depth_optim_slope = max(depth_optim_slope, depth_optim)
+      }
+    }
+  }
+  
   ### Set value
-  if(depth_optim >= allowed_minimum & depth_optim <= allowed_maximum){
-    depth_final = depth_optim
-  }else if(depth_optim < allowed_minimum){
+  if(depth_optim_slope >= allowed_minimum & depth_optim_slope <= allowed_maximum){
+    depth_final = depth_optim_slope
+  }else if(depth_optim_slope < allowed_minimum){
     depth_final = allowed_minimum
-  }else if(depth_optim > allowed_maximum){
+  }else if(depth_optim_slope > allowed_maximum){
     depth_final = allowed_maximum
   }
   return(depth_final)

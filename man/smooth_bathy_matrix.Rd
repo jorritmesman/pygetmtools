@@ -8,9 +8,10 @@ smooth_bathy_matrix(
   mtrx,
   maintain_coords,
   max_val,
-  method = "diff",
+  method = "rx0",
   track_volume = TRUE,
   min_depth = 0,
+  optim_val = NULL,
   global_smoothing = TRUE,
   box_width_global = 4L,
   box_width_shallows = 6L,
@@ -30,8 +31,10 @@ file by 'read_bathy_as_matrix'.}
 
 \item{maintain_coords}{data.table; should have columns 'ind_x' and 'ind_y', which
 should correspond to values in 'mtrx' that should not be affected by the smoothing.
-If NULL, no points are maintained and only 'global' smoothing is applied. Can be
-read from a csv with "x" and "y" coordinates using 'read_coord_maintain_file'}
+Optional column 'fix_depth'; any values filled here are used instead of the
+original bathy's depth. If 'maintain_coords = NULL', no points are maintained
+and only 'global' smoothing is applied. Can be read from a csv with "x" and "y"
+coordinates using 'read_coord_maintain_file'.}
 
 \item{max_val}{numeric; maximum allowed value of 'method'. Should always be positive.}
 
@@ -43,6 +46,13 @@ the maximum slope parameter 'rx0', following Beckmann & Haidvogel (1993)}
 volume of the provided bathymetry.}
 
 \item{min_depth}{numeric; minimum allowed depth (always positive). Defaults to 0.0}
+
+\item{optim_val}{numeric; only used in local smoothing. Similar to 'max_val' (using
+'method' argument), but gives a "preferred" slope to use if this is possible.
+Can be provided as a vector for different steps from the maintain_coords points.
+for any distance further than provided by 'optim_val', the last argument
+is used, so if you don't want further cells to be affected by optim_val, set the
+last element of the vector to max_val. Default = NULL (i.e. 'optim_val' is not used).}
 
 \item{global_smoothing}{logical; if TRUE, global smoothing is applied}
 

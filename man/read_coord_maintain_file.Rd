@@ -8,7 +8,8 @@ read_coord_maintain_file(filepath, ncdf)
 }
 \arguments{
 \item{filepath}{character; path to a csv file with columns "x" and "y"
-(or "ind_x" and "ind_y" already)}
+(or "ind_x" and "ind_y" already). Optional column 'fix_depth'; any values
+filled here are used instead of the original bathy's depth.}
 
 \item{ncdf}{character; path to a PyGETM bathymetry netcdf file}
 }

@@ -1,7 +1,8 @@
 #' Read x and y coordinates from a csv file into indices and return data.table
 #'   
 #' @param filepath  character; path to a csv file with columns "x" and "y"
-#'   (or "ind_x" and "ind_y" already)
+#'   (or "ind_x" and "ind_y" already). Optional column 'fix_depth'; any values
+#'   filled here are used instead of the original bathy's depth. 
 #' @param ncdf character; path to a PyGETM bathymetry netcdf file
 #' 
 #' @examples
