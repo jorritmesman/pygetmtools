@@ -25,7 +25,8 @@ smooth_bathy_matrix(
 )
 }
 \arguments{
-\item{mtrx}{matrix; numeric matrix, describing a bathymetry}
+\item{mtrx}{matrix; numeric matrix, describing a bathymetry, Can be read from a netcdf
+file by 'read_bathy_as_matrix'.}
 
 \item{maintain_coords}{data.table; should have columns 'ind_x' and 'ind_y', which
 should correspond to values in 'mtrx' that should not be affected by the smoothing.

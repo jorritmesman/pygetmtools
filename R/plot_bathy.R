@@ -60,5 +60,12 @@ plot_bathy = function(mtrx, mtrx_ref = NULL, rev_x = FALSE, rev_y = FALSE,
   }
   if(rev_x) p = p + scale_x_reverse()
   if(rev_y) p = p + scale_y_reverse()
+  if(!is.null(mtrx_ref)){
+    p = p + scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0.0)
+  }else{
+    p = p + scale_fill_gradient(low = "white", high = "blue")
+  }
+  p = p + theme_light()
+  
   return(p)
 }

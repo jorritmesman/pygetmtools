@@ -15,7 +15,8 @@
 #'   set and plot the results using 'plot_bathy' and then adjust. The common workflow
 #'   is: 'read_bathy_as_matrix', (iteratively) 'smooth_bathy_matrix' & 'plot_bathy', then
 #'   'add_bathy_to_ncdf'.
-#' @param mtrx  matrix; numeric matrix, describing a bathymetry
+#' @param mtrx  matrix; numeric matrix, describing a bathymetry, Can be read from a netcdf
+#'   file by 'read_bathy_as_matrix'.
 #' @param maintain_coords data.table; should have columns 'ind_x' and 'ind_y', which
 #'   should correspond to values in 'mtrx' that should not be affected by the smoothing.
 #'   If NULL, no points are maintained and only 'global' smoothing is applied. Can be
