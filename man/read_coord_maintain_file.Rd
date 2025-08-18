@@ -4,14 +4,15 @@
 \alias{read_coord_maintain_file}
 \title{Read x and y coordinates from a csv file into indices and return data.table}
 \usage{
-read_coord_maintain_file(filepath, ncdf)
+read_coord_maintain_file(filepath, ncdf = NULL)
 }
 \arguments{
 \item{filepath}{character; path to a csv file with columns "x" and "y"
 (or "ind_x" and "ind_y" already). Optional column 'fix_depth'; any values
 filled here are used instead of the original bathy's depth.}
 
-\item{ncdf}{character; path to a PyGETM bathymetry netcdf file}
+\item{ncdf}{character; path to a PyGETM bathymetry netcdf file. Not needed if
+'ind_x' and 'ind_y' columns are already provided.}
 }
 \description{
 Read x and y coordinates from a csv file into indices and return data.table
