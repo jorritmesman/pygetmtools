@@ -189,11 +189,13 @@ smooth_bathy_matrix = function(mtrx, maintain_coords,
     
     ## Loop to expand from maintain cells, approximating bathy_glob
     while(sum(bathy_new == -1, na.rm = T) > 0L){
+      bathy_use = bathy_new
+      bathy_use[bathy_use > 0.0] = 1.0
       # Loop over the matrix
       for(i in seq_len(max_i)){
         for(j in seq_len(max_j)){
           if(is.na(bathy_new[i, j])) next
-          if(bathy_new[i, j] < 0) next
+          if(bathy_use[i, j] < 0) next
           
           # Left, up, right, down
           cell_orig = as.character(bathy_origin[i, j])
