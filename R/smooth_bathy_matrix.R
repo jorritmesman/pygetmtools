@@ -255,7 +255,7 @@ smooth_bathy_matrix = function(mtrx, maintain_coords,
     message("Volume change after smoothing: ", sum(bathy_new - mtrx, na.rm = T))
   }
   
-  return(bathy_new)
+  return(round(bathy_new, digits = bathy_round))
 }
 
 #### Helper functions for smoothing
