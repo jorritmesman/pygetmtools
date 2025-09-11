@@ -104,8 +104,8 @@ create_inflow_nc_from_csv = function(filename, lat, lon, file_out,
   # Create netcdf
   times_nc = as.numeric(difftime(df_write$all_times, as.POSIXct(origin_getm), units = "hours"))
   timedim = ncdim_def("time", units = paste0("hours since ", origin_getm), vals = times_nc, unlim = T)
-  lon_dim = ncdim_def("longitude", "degrees_east", vals = ifelse(lon >= 0, lon, lon + 360), longname = "longitude")
-  lat_dim = ncdim_def("latitude", "degrees_north", vals = lat, longname = "latitude")
+  lon_dim = ncdim_def("lon", "degrees_east", vals = ifelse(lon >= 0, lon, lon + 360), longname = "lon")
+  lat_dim = ncdim_def("lat", "degrees_north", vals = lat, longname = "lat")
   
   vars = names(df_write)[-1]
   var_list = vector("list", length = length(vars))
