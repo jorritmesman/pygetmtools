@@ -43,8 +43,10 @@ plot_interactive_bathymetry = function(ncdf, bathy_name = "bathymetry", coord_ty
     y_coord = ncvar_get(nc_file,  y_name)
     
     if(coord_type == "indices"){
-      x_coord = order(x_coord)
-      y_coord = order(y_coord)
+      x_rev = ifelse(all(diff(x_coord) > 0), F, T)
+      y_rev = ifelse(all(diff(y_coord) > 0), F, T)
+      x_coord = seq_along(x_coord)
+      y_coord = seq_along(y_coord)
       coord_labels = c("X Index", "Y Index")
       plot_title = "Bathymetry Plot (Indices)"
     }else{
@@ -74,10 +76,10 @@ plot_interactive_bathymetry = function(ncdf, bathy_name = "bathymetry", coord_ty
   # # Original code (caused conflict with dt melt)
   # bath_df2 = reshape2::melt(bath, varnames = coord_names, value.name = "depth")
   
-  if (coord_type == "projected" | coord_type == "indices") {
+  if(coord_type == "projected" | coord_type == "indices"){
     bath_df$x = x_coord[bath_df$x]
     bath_df$y = y_coord[bath_df$y]
-  } else if (coord_type == "geographic") {
+  }else if (coord_type == "geographic"){
     bath_df$lon = lon_coord[bath_df$lon]
     bath_df$lat = lat_coord[bath_df$lat]
   }
@@ -103,6 +105,14 @@ plot_interactive_bathymetry = function(ncdf, bathy_name = "bathymetry", coord_ty
       y = coord_labels[2],
       fill = "Depth"
     )
+  if(coord_type == "indices"){
+    if(x_rev){
+      p = p + scale_x_reverse()
+    }
+    if(y_rev){
+      p = p + scale_y_reverse()
+    }
+  }
   
   interactive_plot = ggplotly(p, tooltip = "text")
   
