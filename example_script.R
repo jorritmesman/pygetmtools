@@ -106,7 +106,7 @@ plot_topview(df = df3[date == max(date)], var = "temp")
 the_transect = fread(system.file("extdata", "transect_west_east_northernmost.csv", package="pygetmtools"))
 visualise_transect(the_transect, bathy_nc = bathy_nc, depth_name = depth_name)
 df4 = read_multiple(output_ncs, var = "temp", transect = the_transect, profile_interval = 1.0)
-plot_sideview(df4, var = "temp")
+plot_sideview(df4[date == max(date)], var = "temp")
 
 ### Saving a plot as a png
 ggsave("example_plot_pygetmtools.png", width = 8, height = 6)
