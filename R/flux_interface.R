@@ -31,6 +31,8 @@ flux_interface = function(ncdfs, interface){
   # Time series for all successive files
   lst_flow_files = list()
   
+  pb = txtProgressBar(min = 0, max = length(ncdfs), style = 3)
+  progress = 0
   for(file_name in ncdfs){
     ### Open and use nc file
     nc = nc_open(file_name)
@@ -148,6 +150,9 @@ flux_interface = function(ncdfs, interface){
     df_file_flow = rbindlist(lst_tmp)
     df_file_flow = df_file_flow[, .(flow = sum(flow)), by = date]
     lst_flow_files[[length(lst_flow_files) + 1]] = df_file_flow
+    
+    progress = progress + 1
+    setTxtProgressBar(pb, progress)
   }
   
   return(rbindlist(lst_flow_files))
