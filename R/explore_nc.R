@@ -32,6 +32,7 @@ explore_nc = function(ncdf, var = NULL, dim = NULL){
   }else if(!is.null(var)){
     if(!(var %in% names(nc$var))) stop(var, " not found in ", ncdf, "!")
     message("Variable longname: ", nc$var[[var]]$longname)
+    message("Unit: ", nc$var[[var]]$units)
     dims = sapply(nc$var[[var]]$dim, "[[", "name")
     dim_lens = sapply(nc$var[[var]]$dim, "[[", "len")
     dim_str = sapply(seq_along(dims), function(x) paste0(dims[x], " (", dim_lens[x], ")"))

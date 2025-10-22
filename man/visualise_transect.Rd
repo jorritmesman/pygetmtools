@@ -8,6 +8,7 @@
 visualise_transect(
   transect,
   bathy_nc,
+  depth_name = "bathymetry",
   single_point_colour = TRUE,
   na_colour = "white",
   ...
@@ -16,6 +17,7 @@ visualise_transect(
 visualize_transect(
   transect,
   bathy_nc,
+  depth_name = "bathymetry",
   single_point_colour = TRUE,
   na_colour = "white",
   ...
@@ -25,6 +27,8 @@ visualize_transect(
 \item{transect}{data.table; a data.table with columns 'x', and 'y'.}
 
 \item{bathy_nc}{character; name of the bathymetry nc file that is used as input into PyGETM}
+
+\item{depth_name}{character; name of the depth variable in the bathy_nc}
 
 \item{single_point_colour}{logical; if TRUE, all points are plotted in the same colour}
 

@@ -4,6 +4,7 @@
 #'
 #' @param transect data.table; a data.table with columns 'x', and 'y'.
 #' @param bathy_nc character; name of the bathymetry nc file that is used as input into PyGETM
+#' @param depth_name character; name of the depth variable in the bathy_nc
 #' @param single_point_colour logical; if TRUE, all points are plotted in the same colour
 #' @param na_colour character; NA values are set to this colour
 #' @param ... Other parameters are fed into the 'labs()' function, and 'palette' can also be specified
@@ -21,7 +22,8 @@
 #' @import ncdf4
 #' @export
 
-visualise_transect = function(transect, bathy_nc, single_point_colour = TRUE, na_colour = "white", ...){
+visualise_transect = function(transect, bathy_nc, depth_name = "bathymetry",
+                              single_point_colour = TRUE, na_colour = "white", ...){
   ### Add a transect id
   if(!("transect_id" %in% names(transect))){
     transect[, transect_id := 1:.N]
@@ -35,7 +37,7 @@ visualise_transect = function(transect, bathy_nc, single_point_colour = TRUE, na
   })
   
   ### Extract depth and reformat to long
-  m_depth = ncvar_get(nc, varid = "bathymetry")
+  m_depth = ncvar_get(nc, varid = depth_name)
   x_dim = ncvar_get(nc, "x")
   y_dim = ncvar_get(nc, "y")
   df_depth = data.table(m_depth)
