@@ -102,7 +102,7 @@ plot_topview(df = df3[date == max(date)], var = "temp")
 
 # Example plot 4: plot a transect
 # This is a bit more complex and assumes you have a set of coordinates where
-# you want to extract data. There is an example of a transect file on the Github
+# you want to extract data. There is an example of a transect file on the Github repository
 the_transect = fread(system.file("extdata", "transect_west_east_northernmost.csv", package="pygetmtools"))
 visualise_transect(the_transect, bathy_nc = bathy_nc, depth_name = depth_name)
 df4 = read_multiple(output_ncs, var = "temp", transect = the_transect, profile_interval = 1.0)
