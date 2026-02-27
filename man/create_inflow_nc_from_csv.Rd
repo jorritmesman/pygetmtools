@@ -12,12 +12,13 @@ create_inflow_nc_from_csv(
   fabmyaml = NULL,
   timestep = "1 hour",
   origin_getm = "1900-01-01 00:00:00",
-  plot = FALSE
+  plot = FALSE,
+  flow_col = "flow"
 )
 }
 \arguments{
-\item{filename}{character; Point to csv file with headers ('date', 'flow', and any constituents).
-'date' needs to have format 'yyyy-mm-dd hh:mm:ss' and 'flow' must be in m3/s}
+\item{filename}{character; Point to csv file with headers ('date', flow_col, and any constituents).
+'date' needs to have format 'yyyy-mm-dd hh:mm:ss' and flow_col must be in m3/s}
 
 \item{lat, lon}{numeric; latitude and longitude in decimal degrees (north/east)}
 
@@ -30,6 +31,8 @@ create_inflow_nc_from_csv(
 \item{origin_getm}{character; 'yyyy-mm-dd hh:mm:ss' format, time origin used in GETM nc file}
 
 \item{plot}{logical; if true, makes a plot of the output that was written}
+
+\item{flow_col}{character; the name of the column with discharge values. default = "flow"}
 }
 \description{
 Create a netcdf inflow file that can be interpreted with the 'pygetm.input.from_nc' python function
