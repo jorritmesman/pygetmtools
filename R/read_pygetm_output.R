@@ -77,7 +77,26 @@ read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = N
   
   # Need to convert z into actual depths
   m_zct = ncvar_get(nc, varid = "zct") # Height of centre of cell
-  m_zft = ncvar_get(nc, varid = "zft") # Height of cell interface
+  if("zft" %in% names(nc$var)){
+    m_zft = ncvar_get(nc, varid = "zft") # Height of cell interface
+  }else{
+    warning("'zft' not found, estimating it from 'zct'")
+    m_zft = array(data = NA, dim = c(dim(m_zct)[1], dim(m_zct)[2], dim(m_zct)[3] + 1, dim(m_zct)[4]))
+    # If not saved, derive interface depths from zct (this is an estimate)
+    for(i_x in seq_len(dim(m_zft)[1])){
+      for(j_x in seq_len(dim(m_zft)[2])){
+        for(t_x in seq_len(dim(m_zft)[4])){
+          diff_zct = diff(m_zct[i_x,j_x,,t_x])
+          diff_zct = c(diff_zct, diff_zct[length(diff_zct)])
+          if(all(is.na(diff_zct)) | all(diff_zct == 0)) next
+          new_zft = sapply(seq_len(length(m_zct[i_x,j_x,,t_x])), function(i) m_zct[i_x,j_x,,t_x][i] - 0.5 * diff_zct[i])
+          new_zft[length(new_zft) + 1] = m_zct[i_x,j_x,,t_x][length(new_zft)] + 0.5 * diff_zct[length(new_zft) - 1]
+          m_zft[i-x,j_x,,t_x] = new_zft
+        }
+      }
+    }
+  }
+  
   # Add time dimension if there is only one time in the file
   if(length(dim(m_all)) == 3L){
     dim(m_all) = c(dim(m_all), 1)
