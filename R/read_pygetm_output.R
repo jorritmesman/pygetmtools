@@ -91,7 +91,7 @@ read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = N
           if(all(is.na(diff_zct)) | all(diff_zct == 0)) next
           new_zft = sapply(seq_len(length(m_zct[i_x,j_x,,t_x])), function(i) m_zct[i_x,j_x,,t_x][i] - 0.5 * diff_zct[i])
           new_zft[length(new_zft) + 1] = m_zct[i_x,j_x,,t_x][length(new_zft)] + 0.5 * diff_zct[length(new_zft) - 1]
-          m_zft[i-x,j_x,,t_x] = new_zft
+          m_zft[i_x,j_x,,t_x] = new_zft
         }
       }
     }
