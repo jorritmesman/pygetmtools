@@ -5,18 +5,17 @@
 \title{Extract part of a matrix}
 \usage{
 slice_matrix_local(
-  mtrx,
+  lst_mtrx,
   depth,
   z,
   mtrx_zct = NULL,
   mtrx_surf = NULL,
   mtrx_bott = NULL,
-  add_depth_to_output = T,
-  profile_interval = NULL
+  add_depth_to_output = T
 )
 }
 \arguments{
-\item{mtrx}{matrix; matrix of the variable to extract. Result of ncdf4::ncvar_get(...)}
+\item{lst_mtrx}{list; list of matrices of the variables to extract. Result of ncdf4::ncvar_get(...)}
 
 \item{depth}{numeric; depth below surface, should be negative. If NULL, extracts all.
 'depth' and 'z' cannot be provided both.}
@@ -31,16 +30,13 @@ of the interfaces ('zft') and given for the uppermost and lowermost layer, respe
 
 \item{add_depth_to_output}{logical; if true and 'depth' is not provided, then
 still 'depth' is calculated for each value of 'z'}
-
-\item{profile_interval}{numeric; single value, calculates output depths for a profile with
-this depth interval}
 }
 \description{
 Extract part of a matrix
 }
 \details{
-Takes a matrix (as gotten from ncvar_get() on a PyGETM local output file) and
-  extracts part of it, based on the input arguments. This function is for internal use in
+Takes a list of matrices (as gotten from ncvar_get() on a PyGETM local output file) and
+  extracts part of them, based on the input arguments. This function is for internal use in
   read_local.R.
 }
 \author{

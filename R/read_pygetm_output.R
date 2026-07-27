@@ -8,9 +8,9 @@
 #'   and 'depth/z'), or 1D/2D from the "side" (provided 'transect' and optionally 'depth/z').
 #'
 #' @param ncdf  character; name of the output nc file
-#' @param var character; name of the variable in the nc file
+#' @param var character; name of the variable in the nc file. Can be a vector.
 #' @param x,y numeric; x and y coordinates. If NULL, extracts all.
-#' @param depth numeric; depth below surface, should be negative. If NULL, extracts all.
+#' @param depth numeric; depth below surface, should be negative. Can be a vector. If NULL, extracts all.
 #'   'depth' and 'z' cannot be provided both.
 #' @param z numeric; layer number (0 at bottom). If NULL, extracts all.
 #'   These are the actual values, not the index (or: index in Python-counting starting at 0).
@@ -20,6 +20,7 @@
 #'   ignored of 'transect' is provided. If NULL, will not extract transect.
 #' @param save_everything logical; if TRUE, exports entire output, without formatting. Defaults to FALSE
 #' @param round_depth,round_val integer; Round depth and variable value to this many digits. No rounding if NULL.
+#'   'round_val' can be a single value or have same length as 'var'.
 #' @param profile_interval numeric; single value, calculates output depths for a profile with
 #'   this depth interval
 #' @author
@@ -58,12 +59,14 @@ read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = N
   })
   
   # Extra validity check - should be a 3D PyGETM output file and 'var' should occur
-  if(!(var %in% names(nc$var))){
-    stop("'var' cannot be found in the 'ncdf' file!")
+  if(any(var %notin% names(nc$var))){
+    stop("'", paste(var[var %notin% names(nc$var)], collapse = ", "),
+         "' cannot be found in the 'ncdf' file!")
   }
   
   ### Extract variable
-  m_all = ncvar_get(nc, varid = var)
+  m_all = lapply(var, function(x) ncvar_get(nc, varid = x))
+  names(m_all) = var
   
   # Dimensions: x, y, z, time
   x_dim = ncvar_get(nc, "xt")[, 1] # Equidistant grid, so column 1 is the same as any other
@@ -98,15 +101,17 @@ read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = N
   }
   
   # Add time dimension if there is only one time in the file
-  if(length(dim(m_all)) == 3L){
-    dim(m_all) = c(dim(m_all), 1)
+  if(length(dim(m_all[[1]])) == 3L){
+    for(i in seq_len(length(m_all))){
+      dim(m_all[[i]]) = c(dim(m_all[[i]]), 1)
+    }
     dim(m_zct) = c(dim(m_zct), 1)
     dim(m_zft) = c(dim(m_zft), 1)
     add_dim = T # Need to re-add time-dimension to m_lvl_surf and ._bott
   }else{
     add_dim = F
   }
-  m_lvl_surf = m_zft[,, dim(m_all)[3] + 1,] # Height of surface
+  m_lvl_surf = m_zft[,, dim(m_all[[1]])[3] + 1,] # Height of surface
   m_lvl_bott = m_zft[,, 1,] # Height of bottom
   rm(m_zft)
   if(add_dim){
@@ -114,17 +119,29 @@ read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = N
     dim(m_lvl_bott) = c(dim(m_lvl_bott), 1)
   }
   
+  # Create depths from profile if needed
+  if(!is.null(profile_interval)){
+    depth = seq(0, min(m_lvl_bott, na.rm = T), by = -abs(profile_interval))
+  }
+  
   df_var = slice_matrix(m_all, x_dim = x_dim, y_dim = y_dim,
                         x = x, y = y, depth = depth, z = z,
                         transect = transect, mtrx_zct = m_zct,
-                        mtrx_surf = m_lvl_surf, mtrx_bott = m_lvl_bott,
-                        profile_interval = profile_interval)
+                        mtrx_surf = m_lvl_surf, mtrx_bott = m_lvl_bott)
   
   if(!is.null(round_depth) & "depth" %in% names(df_var)){
     df_var[, depth := round(depth, digits = round_depth)]
   }
+  
   if(!is.null(round_val)){
-    df_var[, val := round(val, digits = round_val)]
+    for(i in seq_along(var)){
+      the_name = var[i]
+      if(length(round_val) == 1L){
+        df_var[, (the_name) := round(get(the_name), digits = round_val)]
+      }else{
+        df_var[, (the_name) := round(get(the_name), digits = round_val[i])]
+      }
+    }
   }
   
   # Convert time_ind to an actual date
@@ -148,9 +165,6 @@ read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = N
   if("z" %in% names(df_var)){
     df_var[, z := z - 1]
   }
-  
-  # Set correct name
-  setnames(df_var, old = "val", new = var)
   
   return(df_var)
 }

@@ -5,7 +5,7 @@
 \title{Extract part of a matrix}
 \usage{
 slice_matrix(
-  mtrx,
+  lst_mtrx,
   x_dim,
   y_dim,
   x,
@@ -16,12 +16,11 @@ slice_matrix(
   mtrx_zct = NULL,
   mtrx_surf = NULL,
   mtrx_bott = NULL,
-  add_depth_to_output = T,
-  profile_interval = NULL
+  add_depth_to_output = T
 )
 }
 \arguments{
-\item{mtrx}{matrix; matrix of the variable to extract. Result of ncdf4::ncvar_get(...)}
+\item{lst_mtrx}{list; list of matrices of the variables to extract. Result of ncdf4::ncvar_get(...)}
 
 \item{x_dim, y_dim}{numeric; vector of the values of the 'x' and 'y' dimensions}
 
@@ -45,9 +44,6 @@ of the interfaces ('zft') and given for the uppermost and lowermost layer, respe
 
 \item{add_depth_to_output}{logical; if true and 'depth' is not provided, then
 still 'depth' is calculated for each value of 'z'}
-
-\item{profile_interval}{numeric; single value, calculates output depths for a profile with
-this depth interval}
 }
 \description{
 Extract part of a matrix
@@ -56,9 +52,7 @@ Extract part of a matrix
 Takes a matrix (as gotten from ncvar_get() on a PyGETM output file) and
   extracts part of it, based on the input arguments. 
   The dimensions of the matrix, in order, are 'x', 'y', 'z', 'time'
-  At least for now, if specified, x, y, z, and depth must be single numbers:
-  ranges are not possible. This function is for internal use in
-  read_pygetm_output.R.
+  This function is for internal use in read_pygetm_output.R.
 }
 \author{
 Jorrit Mesman

@@ -25,10 +25,12 @@
 extract_from_profile = function(vals, depths, depths_out, depth_bott){
   if(any(depths_out > 0)) stop("None of 'depths_out' should be positive!")
   
-  vals_out = approx(depths, y = vals, xout = depths_out, rule = 2)$y
+  vals = as.matrix(vals)
+  
+  vals_out = apply(vals, 2, function(x) approx(depths, y = x, xout = depths_out, rule = 2)$y)
   
   # Below depth_bott, set values to NA 
-  vals_out[depths_out < depth_bott] = NA
+  vals_out[depths_out < depth_bott, ] = NA
   
   return(vals_out)
 }

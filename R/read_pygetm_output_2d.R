@@ -4,7 +4,7 @@
 #'   Read a PyGETM 2D output file into R.
 #'
 #' @param ncdf  character; name of the output nc file
-#' @param var character; name of the variable in the nc file
+#' @param var character; name of the variable in the nc file. Can be a vector.
 #' @param round_val integer; Round depth and variable value to this many digits. No rounding if NULL.
 #' @author
 #'   Jorrit Mesman
@@ -26,40 +26,74 @@ read_pygetm_output_2d = function(ncdf, var, round_val = NULL){
   })
   
   # 'var' should occur in the file
-  if(!(var %in% names(nc$var))){
-    stop("'var' cannot be found in the 'ncdf' file!")
+  if(any(var %notin% names(nc$var))){
+    stop("'", paste(var[var %notin% names(nc$var)], collapse = ", "),
+         "' cannot be found in the 'ncdf' file!")
   }
   
   ### Extract variable
-  m_var = ncvar_get(nc, varid = var)
+  m_var = lapply(var, function(x) ncvar_get(nc, varid = x))
+  names(m_var) = var
   
   # Dimensions: x, y(, time)
   x_dim = ncvar_get(nc, "xt")[, 1] # Equidistant grid, so column 1 is the same as any other
   y_dim = ncvar_get(nc, "yt")[1,]
   
   # Add time dimension if there is only one time in the file
-  if(length(dim(m_var)) == 2L){
-    dim(m_var) = c(dim(m_var), 1)
+  if(length(dim(m_var[[1]])) == 2L){
+    for(i in seq_len(length(m_var))){
+      dim(m_var[[i]]) = c(dim(m_var[[i]]), 1)
+    }
   }
   
   # Slice matrix
-  lst_mtrx = lapply(seq_len(dim(m_var)[3]), function(t){
-    tmp_df = data.table(m_var[,, t])
-    setnames(tmp_df, as.character(y_dim))
-    tmp_df[, `:=`(x = x_dim,
-                  time_ind = t)]
-    tmp_df
+  lst_tmp = lapply(names(m_var), function(var_nm){
+    rbindlist(
+      lapply(seq_len(dim(m_var[[var_nm]])[3]), function(t){
+        tmp_df = data.table(m_var[[var_nm]][, , t])
+        setnames(tmp_df, as.character(y_dim))
+        tmp_df[, `:=`(x = x_dim,
+                      time_ind = t)]
+        tmp_df = melt(tmp_df,
+                      id.vars = c("time_ind", "x"),
+                      variable.factor = FALSE,
+                      variable.name = "y",
+                      value.name = var_nm)
+        tmp_df[, y := as.numeric(y)]
+        tmp_df
+      })
+    )
   })
-  df_var = rbindlist(lst_mtrx)
-  df_var = melt(df_var, id.vars = c("time_ind", "x"), variable.factor = F,
-                variable.name = "y", value.name = "val")
-  df_var[, y := as.numeric(y)]
   
-  df_var = df_var[!is.na(val)]
+  df_var = Reduce(
+    function(x, y){
+      merge(x, y, by = c("time_ind", "x", "y"), all = TRUE)
+    },
+    lst_tmp
+  )
+  
+  keep = if(length(var) == 1){
+    !is.na(df_var[[var]])
+  }else{
+    df_var[, rowSums(!is.na(.SD)) > 0, .SDcols = var]
+  }
+  
+  df_var = df_var[keep]
+  if(nrow(df_var) == 0L){
+    message("No data on this location.")
+    return(df_var)
+  }
   
   # Rounding
   if(!is.null(round_val)){
-    df_var[, val := round(val, digits = round_val)]
+    for(i in seq_along(var)){
+      the_name = var[i]
+      if(length(round_val) == 1L){
+        df_var[, (the_name) := round(get(the_name), digits = round_val)]
+      }else{
+        df_var[, (the_name) := round(get(the_name), digits = round_val[i])]
+      }
+    }
   }
   
   # Convert time_ind to an actual date
@@ -78,9 +112,6 @@ read_pygetm_output_2d = function(ncdf, var, round_val = NULL){
   df_var[, time_ind := dict_convert(time_ind, dict_time)]
   df_var[, time_ind := as.POSIXct(as.numeric(time_ind), origin = origin, tz = "UTC")]
   setnames(df_var, old = "time_ind", new = "date")
-  
-  # Set correct name
-  setnames(df_var, old = "val", new = var)
   
   return(df_var)
 }

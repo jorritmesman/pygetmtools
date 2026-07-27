@@ -4,11 +4,9 @@
 #'   Takes a matrix (as gotten from ncvar_get() on a PyGETM output file) and
 #'   extracts part of it, based on the input arguments. 
 #'   The dimensions of the matrix, in order, are 'x', 'y', 'z', 'time'
-#'   At least for now, if specified, x, y, z, and depth must be single numbers:
-#'   ranges are not possible. This function is for internal use in
-#'   read_pygetm_output.R. 
+#'   This function is for internal use in read_pygetm_output.R. 
 #'
-#' @param mtrx  matrix; matrix of the variable to extract. Result of ncdf4::ncvar_get(...)
+#' @param lst_mtrx list; list of matrices of the variables to extract. Result of ncdf4::ncvar_get(...)
 #' @param x_dim,y_dim numeric; vector of the values of the 'x' and 'y' dimensions
 #' @param x,y numeric; x and y coordinates. If NULL, extracts all.
 #'   These are the actual values, not the index.
@@ -24,15 +22,13 @@
 #'   of the interfaces ('zft') and given for the uppermost and lowermost layer, respectively
 #' @param add_depth_to_output logical; if true and 'depth' is not provided, then
 #'   still 'depth' is calculated for each value of 'z'
-#' @param profile_interval numeric; single value, calculates output depths for a profile with
-#'   this depth interval
 #' @author
 #'   Jorrit Mesman
 
-slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct = NULL,
+slice_matrix = function(lst_mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct = NULL,
                         mtrx_surf = NULL, mtrx_bott = NULL,
-                        add_depth_to_output = T, profile_interval = NULL){
-  m_dims = dim(mtrx)
+                        add_depth_to_output = T){
+  m_dims = dim(lst_mtrx[[1]])
   
   # Separate approaches transects and others
   if(is.null(transect)){
@@ -61,38 +57,61 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
     
     # Using this apply-function ensures that the result can be written as a data.table
     if(any(!is.null(x), !is.null(y), !is.null(z))){
-      lst_mtrx = lapply(seq_len(m_dims[4]), function(t){
-        tmp_df = data.table(mtrx[x_extent,
-                                 y_extent,
-                                 z_extent,
-                                 t])
-        setnames(tmp_df, as.character(y_extent))
-        tmp_df[, `:=`(x_ind = x_extent,
-                      z = z_extent,
-                      time_ind = t)]
-        tmp_df
-      })
-    }else{
-      lst_mtrx = lapply(seq_len(m_dims[4]), function(t){
-        lst_mtrx_z = lapply(seq_len(m_dims[3]), function(z){
-          tmp_df = data.table(mtrx[x_extent,
-                                   y_extent,
-                                   z,
-                                   t])
+      lst_tmp = lapply(names(lst_mtrx), function(var_nm){
+        lst_dims = lapply(seq_len(m_dims[4]), function(t){
+          tmp_df = data.table(lst_mtrx[[var_nm]][x_extent,
+                                                 y_extent,
+                                                 z_extent,
+                                                 t])
           setnames(tmp_df, as.character(y_extent))
           tmp_df[, `:=`(x_ind = x_extent,
-                        z = z,
+                        z = z_extent,
                         time_ind = t)]
+          tmp_df = melt(tmp_df,
+                        id.vars = c("x_ind", "z", "time_ind"),
+                        variable.factor = FALSE,
+                        variable.name = "y_ind",
+                        value.name = var_nm)
+          tmp_df[, y_ind := as.numeric(y_ind)]
           tmp_df
         })
-        rbindlist(lst_mtrx_z)
+        rbindlist(lst_dims)
+      })
+    }else{
+      lst_tmp = lapply(names(lst_mtrx), function(var_nm){
+        lst_dims = lapply(seq_len(m_dims[4]), function(t){
+          lst_z = lapply(seq_len(m_dims[3]), function(z){
+            tmp_df = data.table(lst_mtrx[[var_nm]][x_extent,
+                                                   y_extent,
+                                                   z,
+                                                   t])
+            setnames(tmp_df, as.character(y_extent))
+            tmp_df[, `:=`(x_ind = x_extent,
+                          z = z,
+                          time_ind = t)]
+            
+            tmp_df = melt(tmp_df,
+                          id.vars = c("x_ind", "z", "time_ind"),
+                          variable.factor = FALSE,
+                          variable.name = "y_ind",
+                          value.name = var_nm)
+            tmp_df[, y_ind := as.numeric(y_ind)]
+            tmp_df
+          })
+          rbindlist(lst_z)
+        })
+        rbindlist(lst_dims)
       })
     }
     
-    df_var = rbindlist(lst_mtrx)
-    df_var = melt(df_var, id.vars = c("x_ind", "z", "time_ind"), variable.factor = F,
-                  variable.name = "y_ind", value.name = "val")
-    df_var[, y_ind := as.numeric(y_ind)]
+    df_var = Reduce(
+      function(x, y){
+        merge(x, y,
+              by = c("x_ind", "z", "time_ind", "y_ind"),
+              all = TRUE)
+      },
+      lst_tmp
+    )
     
     # Go from indices to coordinates
     df_var[, `:=`(x = dict_convert(x_ind, dict_x),
@@ -105,20 +124,36 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
     }else{
       z_extent = z
     }
-    lst_mtrx = lapply(seq_len(nrow(transect)), function(id){
-      lst_mtrx_t = lapply(seq_len(m_dims[4]), function(t){
-        data.table(transect_id = id,
-                   x = transect[id, x],
-                   y = transect[id, y],
-                   z = z_extent,
-                   time_ind = t,
-                   val = mtrx[get_ind(transect[id, x], x_dim),
-                              get_ind(transect[id, y], y_dim),
-                              z_extent, t])
-      })
-      rbindlist(lst_mtrx_t)
+    
+    lst_tmp = lapply(names(lst_mtrx), function(var_nm){
+      rbindlist(
+        lapply(seq_len(nrow(transect)), function(id){
+          rbindlist(
+            lapply(seq_len(m_dims[4]), function(t){
+              data.table(transect_id = id,
+                         x = transect[id, x],
+                         y = transect[id, y],
+                         z = z_extent,
+                         time_ind = t,
+                         tmp = lst_mtrx[[var_nm]][get_ind(transect[id, x], x_dim),
+                                                  get_ind(transect[id, y], y_dim),
+                                                  z_extent,
+                                                  t])[, (var_nm) := tmp][, tmp := NULL]
+            })
+          )
+        })
+      )
     })
-    df_var = rbindlist(lst_mtrx)
+    
+    df_var = Reduce(
+      function(x, y){
+        merge(x, y,
+              by = c("transect_id", "x", "y", "z", "time_ind"),
+              all = TRUE)
+      },
+      lst_tmp
+    )
+    
     setorder(df_var, transect_id, time_ind, x, y, z)
     
     # Need to add x_ind and y_ind
@@ -127,20 +162,26 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
   }
   
   # Any missing grid cell can be assumed to be NA in further analyses
-  df_var = df_var[!is.na(val)]
+  var_cols = names(lst_mtrx)
+  keep = if(length(var_cols) == 1){
+    !is.na(df_var[[var_cols]])
+  }else{
+    df_var[, rowSums(!is.na(.SD)) > 0, .SDcols = var_cols]
+  }
+  df_var = df_var[keep]
   if(nrow(df_var) == 0L){
     message("No data on this location.")
     return(df_var)
   }
   
-  if(!is.null(depth) | !is.null(profile_interval) | add_depth_to_output){
+  if(!is.null(depth) | add_depth_to_output){
     # Find the zct values for the grids in df_var
     zct_vals = mtrx_zct[as.matrix(df_var[, .(x_ind, y_ind, z, time_ind)])]
     df_var[, zct := zct_vals]
     rm(zct_vals)
   }
   
-  if(!is.null(depth) | !is.null(profile_interval)){
+  if(!is.null(depth)){
     # Add surface and bottom levels
     z_surf_vals = mtrx_surf[as.matrix(df_var[, .(x_ind, y_ind, time_ind)])]
     z_bott_vals = mtrx_bott[as.matrix(df_var[, .(x_ind, y_ind, time_ind)])]
@@ -156,33 +197,42 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
                   z_bott = NULL)]
     
     # Extract value for specified depth
-    if(!is.null(depth)){
-      the_depths = depth
-    }else if(!is.null(profile_interval)){
-      the_depths = seq(0, min(df_var$depth_bott), by = -abs(profile_interval))
-    }
+    the_depths = depth
     
     if(is.null(transect)){
-      df_var = df_var[, .(depth = the_depths,
-                          val = extract_from_profile(vals = val,
-                                                     depths = depth_rel_surf,
-                                                     depths_out = the_depths,
-                                                     depth_bott = unique(depth_bott))),
-                      by = .(time_ind, x, y)]
+      df_var = df_var[, {vals_out = extract_from_profile(vals = .SD,
+                                                         depths = depth_rel_surf,
+                                                         depths_out = the_depths,
+                                                         depth_bott = unique(depth_bott))
+      as.data.table(vals_out)[, depth := the_depths][]},
+      by = time_ind,
+      .SDcols = names(lst_mtrx)]
     }else{
-      df_var = df_var[, .(depth = the_depths,
-                          x = unique(x),
-                          y = unique(y),
-                          val = extract_from_profile(vals = val,
-                                                     depths = depth_rel_surf,
-                                                     depths_out = the_depths,
-                                                     depth_bott = unique(depth_bott))),
-                      by = .(time_ind, transect_id)]
+      df_var = df_var[, {
+        vals_out = extract_from_profile(vals = .SD,
+                                        depths = depth_rel_surf,
+                                        depths_out = the_depths,
+                                        depth_bott = unique(depth_bott))
+        
+        cbind(data.table(depth = the_depths,
+                         x = unique(x),
+                         y = unique(y)),
+              as.data.table(vals_out))
+      },
+      by = .(time_ind, transect_id),
+      .SDcols = names(lst_mtrx)]
     }
   }
   
   # Second time removing NA values
-  df_var = df_var[!is.na(val)]
+  var_cols = names(lst_mtrx)
+  keep = if(length(var_cols) == 1){
+    !is.na(df_var[[var_cols]])
+  }else{
+    df_var[, rowSums(!is.na(.SD)) > 0, .SDcols = var_cols]
+  }
+  
+  df_var = df_var[keep]
   if(nrow(df_var) == 0L){
     message("No data on this location.")
     return(df_var)
@@ -200,7 +250,7 @@ slice_matrix = function(mtrx, x_dim, y_dim, x, y, depth, z, transect, mtrx_zct =
   if("z" %in% names(df_var)) cols_to_keep = c(cols_to_keep, "z")
   if("depth" %in% names(df_var)) cols_to_keep = c(cols_to_keep, "depth")
   if(!is.null(transect)) cols_to_keep = c(cols_to_keep, "transect_id")
-  cols_to_keep = c(cols_to_keep, "val")
+  cols_to_keep = c(cols_to_keep, names(lst_mtrx))
   
   df_var = df_var[, ..cols_to_keep]
   if(is.null(transect)){

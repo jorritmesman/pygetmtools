@@ -7,15 +7,16 @@
 #'   and "pygetm.output.operators.IndexXY.parameterize"
 #'
 #' @param ncdf  character; name of the local output nc file
-#' @param var character; name of the variable in the nc file
-#' @param depth numeric; depth below surface, should be negative. If NULL, extracts all.
+#' @param var character; name of the variable in the nc file. Can be a vector.
+#' @param depth numeric; depth below surface, should be negative. Can be a vector.  If NULL, extracts all.
 #'   'depth' and 'z' cannot be provided both.
 #' @param z numeric; layer number (0 at bottom). If NULL, extracts all.
 #'   These are the actual values, not the index (or: index in Python-counting starting at 0).
 #'   'depth' and 'z' cannot be provided both.
 #' @param round_depth,round_val integer; Round depth and variable value to this many digits. No rounding if NULL.
+#'   'round_val' can be a single value or have same length as 'var'.
 #' @param profile_interval numeric; single value, calculates output depths for a profile with
-#'   this depth interval
+#'   this depth interval. Overwrites depth.
 #' @author
 #'   Jorrit Mesman
 #' @examples
@@ -46,12 +47,14 @@ read_local = function(ncdf, var, depth = NULL, z = NULL, round_depth = NULL, rou
   })
   
   # Extra validity check - should be a 3D PyGETM output file and 'var' should occur
-  if(!(var %in% names(nc$var))){
-    stop("'var' cannot be found in the 'ncdf' file!")
+  if(any(var %notin% names(nc$var))){
+    stop("'", paste(var[var %notin% names(nc$var)], collapse = ", "),
+         "' cannot be found in the 'ncdf' file!")
   }
   
   ### Extract variable
-  m_all = ncvar_get(nc, varid = var)
+  m_all = lapply(var, function(x) ncvar_get(nc, varid = x))
+  names(m_all) = var
   
   # Need to convert z into actual depths
   m_zct = ncvar_get(nc, varid = "zct") # Height of centre of cell
@@ -74,18 +77,28 @@ read_local = function(ncdf, var, depth = NULL, z = NULL, round_depth = NULL, rou
   m_lvl_bott = m_zft[1,] # Height of bottom
   rm(m_zft)
   
+  # Create depths from profile if needed
+  if(!is.null(profile_interval)){
+    depth = seq(0, min(m_lvl_bott), by = -abs(profile_interval))
+  }
+  
   df_var = slice_matrix_local(m_all, depth = depth, z = z,
                               mtrx_zct = m_zct,
-                              mtrx_surf = m_lvl_surf, mtrx_bott = m_lvl_bott,
-                              profile_interval = profile_interval)
+                              mtrx_surf = m_lvl_surf, mtrx_bott = m_lvl_bott)
   
   if(!is.null(round_depth) & "depth" %in% names(df_var)){
     df_var[, depth := round(depth, digits = round_depth)]
   }
   if(!is.null(round_val)){
-    df_var[, val := round(val, digits = round_val)]
+    for(i in seq_along(var)){
+      the_name = var[i]
+      if(length(round_val) == 1L){
+        df_var[, (the_name) := round(get(the_name), digits = round_val)]
+      }else{
+        df_var[, (the_name) := round(get(the_name), digits = round_val[i])]
+      }
+    }
   }
-  
   # Convert time_ind to an actual date
   tim = ncvar_get(nc, "time")
   tunits = ncatt_get(nc, "time")
@@ -107,9 +120,6 @@ read_local = function(ncdf, var, depth = NULL, z = NULL, round_depth = NULL, rou
   if("z" %in% names(df_var)){
     df_var[, z := z - 1]
   }
-  
-  # Set correct name
-  setnames(df_var, old = "val", new = var)
   
   return(df_var)
 }

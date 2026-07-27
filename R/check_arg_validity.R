@@ -51,7 +51,7 @@ check_arg_validity = function(ncdf, x, y, depth, z, transect, save_everything){
   }
   
   if(!is.null(depth)){
-    if(depth > 0) stop("'depth' should be a negative number!")
+    if(any(depth > 0)) stop("'depth' should be a negative number!")
   }
   
   if(!is.null(transect)){

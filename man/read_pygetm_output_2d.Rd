@@ -9,7 +9,7 @@ read_pygetm_output_2d(ncdf, var, round_val = NULL)
 \arguments{
 \item{ncdf}{character; name of the output nc file}
 
-\item{var}{character; name of the variable in the nc file}
+\item{var}{character; name of the variable in the nc file. Can be a vector.}
 
 \item{round_val}{integer; Round depth and variable value to this many digits. No rounding if NULL.}
 }

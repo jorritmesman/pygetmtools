@@ -21,11 +21,11 @@ read_pygetm_output(
 \arguments{
 \item{ncdf}{character; name of the output nc file}
 
-\item{var}{character; name of the variable in the nc file}
+\item{var}{character; name of the variable in the nc file. Can be a vector.}
 
 \item{x, y}{numeric; x and y coordinates. If NULL, extracts all.}
 
-\item{depth}{numeric; depth below surface, should be negative. If NULL, extracts all.
+\item{depth}{numeric; depth below surface, should be negative. Can be a vector. If NULL, extracts all.
 'depth' and 'z' cannot be provided both.}
 
 \item{z}{numeric; layer number (0 at bottom). If NULL, extracts all.
@@ -38,7 +38,8 @@ ignored of 'transect' is provided. If NULL, will not extract transect.}
 
 \item{save_everything}{logical; if TRUE, exports entire output, without formatting. Defaults to FALSE}
 
-\item{round_depth, round_val}{integer; Round depth and variable value to this many digits. No rounding if NULL.}
+\item{round_depth, round_val}{integer; Round depth and variable value to this many digits. No rounding if NULL.
+'round_val' can be a single value or have same length as 'var'.}
 
 \item{profile_interval}{numeric; single value, calculates output depths for a profile with
 this depth interval}
