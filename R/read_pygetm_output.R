@@ -74,7 +74,6 @@ read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = N
   
   ### Slice and format the matrix into the desired output
   if(save_everything){
-    nc_close(nc)
     return(m_all)
   }
   
