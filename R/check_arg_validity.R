@@ -38,7 +38,7 @@ check_arg_validity = function(ncdf, x, y, depth, z, transect, profile_interval, 
     return()
   }
   
-  if(is.null(x) & is.null(y) & is.null(z) & is.null(depth) & is.null(transect) & & is.null(profile_interval)){
+  if(is.null(x) & is.null(y) & is.null(z) & is.null(depth) & is.null(transect) & is.null(profile_interval)){
     stop("At least one of 'x', 'y', 'z', 'depth', or 'transect' should be specified, or use 'save_everything'!")
   }
   
