@@ -15,7 +15,7 @@
 #'   ignored of 'transect' is provided. If NULL, will not extract transect.
 #' @param save_everything logical; if TRUE, exports entire output, without formatting. Defaults to FALSE
 
-check_arg_validity = function(ncdf, x, y, depth, z, transect, save_everything){
+check_arg_validity = function(ncdf, x, y, depth, z, transect, profile_interval, save_everything){
   # Check argument types
   if((!is.character(ncdf) & !is.null(ncdf)) |
      (!is.numeric(x) & !is.null(x)) |
@@ -23,6 +23,7 @@ check_arg_validity = function(ncdf, x, y, depth, z, transect, save_everything){
      (!is.numeric(depth) & !is.null(depth)) |
      (!is.numeric(z) & !is.null(z)) |
      (!is.data.frame(transect) & !is.null(transect)) |
+     (!is.numeric(profile_interval) & !is.null(profile_interval)) |
      (!is.logical(save_everything) & !is.null(save_everything))){
     stop("Some argument types are wrong!")
   }
@@ -37,7 +38,7 @@ check_arg_validity = function(ncdf, x, y, depth, z, transect, save_everything){
     return()
   }
   
-  if(is.null(x) & is.null(y) & is.null(z) & is.null(depth) & is.null(transect)){
+  if(is.null(x) & is.null(y) & is.null(z) & is.null(depth) & is.null(transect) & & is.null(profile_interval)){
     stop("At least one of 'x', 'y', 'z', 'depth', or 'transect' should be specified, or use 'save_everything'!")
   }
   

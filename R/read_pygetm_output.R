@@ -44,7 +44,8 @@
 read_pygetm_output = function(ncdf, var, x = NULL, y = NULL, depth = NULL, z = NULL, transect = NULL, save_everything = F,
                               round_depth = NULL, round_val = NULL, profile_interval = NULL){
   ### Check validity of input arguments
-  check_arg_validity(ncdf = ncdf, x = x, y = y, depth = depth, z = z, transect = transect, save_everything = save_everything)
+  check_arg_validity(ncdf = ncdf, x = x, y = y, depth = depth, z = z, transect = transect,
+                     profile_interval = profile_interval, save_everything = save_everything)
   
   ### Python starts at 0, so add 1 to z
   if(!is.null(z)){
